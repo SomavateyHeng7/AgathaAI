@@ -1,408 +1,478 @@
-# GenAI Platform - Deployment Guide
+# AgathaAI Platform - Official Deployment Guide
 
-Complete guide for deploying the GenAI Platform to production.
+**Document Type**: Operational Procedures  
+**Version**: 1.0  
+**Date**: February 2, 2026  
+**Status**: Official Release  
+**Classification**: Internal - Operations
 
-## Architecture Overview
+---
 
-```
-┌─────────────┐      ┌──────────────┐      ┌─────────────┐
-│   Next.js   │─────▶│  Express API │─────▶│ PostgreSQL  │
-│  Frontend   │      │   Backend    │      │  Database   │
-└─────────────┘      └──────────────┘      └─────────────┘
-                            │
-                            ▼
-                     ┌──────────────┐
-                     │  LLM APIs    │
-                     │ OpenAI/etc   │
-                     └──────────────┘
-```
+## Table of Contents
 
-## Prerequisites
+1. [Prerequisites](#1-prerequisites)
+2. [Environment Setup](#2-environment-setup)
+3. [Database Configuration](#3-database-configuration)
+4. [Application Deployment](#4-application-deployment)
+5. [Verification & Testing](#5-verification--testing)
+6. [Production Checklist](#6-production-checklist)
 
-- Node.js 18+
-- PostgreSQL 14+
-- Domain name
-- SSL certificate
-- LLM API keys (OpenAI, Anthropic, Together AI)
+---
 
-## Step 1: Database Setup
+## 1. Prerequisites
 
-### Option A: Managed PostgreSQL (Recommended)
-Use managed services like:
-- AWS RDS
-- Google Cloud SQL
-- Azure Database
-- Supabase
-- Neon
+### 1.1 Required Tools
 
-### Option B: Self-hosted PostgreSQL
+- Node.js 20 LTS or higher
+- PostgreSQL 14 or higher
+- Docker 24.0 or higher
+- AWS CLI v2
+- Terraform 1.6 or higher
+- Git
 
-```bash
-# Install PostgreSQL
-sudo apt-get install postgresql-14
+### 1.2 Required Access
 
-# Create database
-sudo -u postgres createdb genai_platform
+- AWS Account with admin access
+- GitHub repository access
+- LLM Provider API keys (OpenAI, Gemini, DeepSeek)
+- Domain name and DNS management
 
-# Create user
-sudo -u postgres psql
-CREATE USER genai_admin WITH PASSWORD 'secure_password';
-GRANT ALL PRIVILEGES ON DATABASE genai_platform TO genai_admin;
-```
+### 1.3 Required Knowledge
 
-### Run Migrations
+- AWS services (ECS, RDS, Lambda, S3)
+- Docker containerization
+- PostgreSQL database administration
+- Next.js application deployment
+
+---
+
+## 2. Environment Setup
+
+### 2.1 Development Environment
 
 ```bash
-psql -d genai_platform -f database/migrations/001_initial_schema.sql
-psql -d genai_platform -f database/seeds/001_subscription_plans.sql
-```
-
-## Step 2: Backend Deployment
-
-### Option A: Vercel (Recommended for Next.js)
-
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy backend
-cd backend
-vercel --prod
-```
-
-### Option B: AWS EC2
-
-```bash
-# SSH to EC2 instance
-ssh -i key.pem ubuntu@your-ec2-ip
-
-# Install Node.js
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
 # Clone repository
-git clone your-repo-url
-cd genai-platform/backend
+git clone https://github.com/your-org/agatha-ai.git
+cd agatha-ai
 
 # Install dependencies
-npm ci --only=production
+npm install
 
-# Build
-npm run build
-
-# Setup PM2 for process management
-npm install -g pm2
-pm2 start dist/index.js --name genai-api
-pm2 startup
-pm2 save
+# Configure environment
+cp .env.local.example .env.local
+# Edit .env.local with your configuration
 ```
 
-### Option C: Docker
+### 2.2 Environment Variables
 
-```bash
-# Build image
-docker build -t genai-backend ./backend
-
-# Run container
-docker run -d \
-  -p 8000:8000 \
-  --env-file backend/.env \
-  --name genai-api \
-  genai-backend
-```
-
-### Environment Variables
-
-Create `backend/.env`:
-
+**Required Variables**:
 ```env
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5432/genai_platform
+
+# JWT Secret (min 32 characters)
+JWT_SECRET=your-secure-random-string-min-32-chars
+
+# LLM API Keys
+OPENAI_API_KEY=sk-proj-...
+GEMINI_API_KEY=AIzaSy...
+DEEPSEEK_API_KEY=sk-...
+
+# Environment
 NODE_ENV=production
-PORT=8000
-DATABASE_URL=postgresql://user:pass@host:5432/genai_platform
-JWT_SECRET=your-super-secret-jwt-key-min-32-chars
-OPENAI_API_KEY=sk-your-openai-key
-ANTHROPIC_API_KEY=sk-ant-your-anthropic-key
-TOGETHER_API_KEY=your-together-key
-FRONTEND_URL=https://your-domain.com
 ```
 
-## Step 3: Frontend Deployment
-
-### Option A: Vercel (Recommended)
-
-```bash
-cd genai-platform
-vercel --prod
-```
-
-Configure environment variables in Vercel dashboard:
-- `NEXT_PUBLIC_API_URL=https://api.your-domain.com/api/v1`
-
-### Option B: Netlify
-
-```bash
-# Install Netlify CLI
-npm i -g netlify-cli
-
-# Deploy
-netlify deploy --prod
-```
-
-### Option C: Self-hosted with Nginx
-
-```bash
-# Build Next.js
-npm run build
-
-# Start production server
-npm start
-
-# Or use PM2
-pm2 start npm --name genai-frontend -- start
-```
-
-Nginx configuration:
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-    
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-## Step 4: SSL/TLS Setup
-
-### Using Let's Encrypt (Free)
-
-```bash
-# Install certbot
-sudo apt-get install certbot python3-certbot-nginx
-
-# Get certificate
-sudo certbot --nginx -d your-domain.com -d api.your-domain.com
-
-# Auto-renewal
-sudo certbot renew --dry-run
-```
-
-## Step 5: DNS Configuration
-
-Point your domain to your servers:
-
-```
-A     your-domain.com        → Frontend IP
-A     api.your-domain.com    → Backend IP
-CNAME www.your-domain.com    → your-domain.com
-```
-
-## Step 6: API Keys Setup
-
-### OpenAI
-1. Go to https://platform.openai.com/api-keys
-2. Create new API key
-3. Add to backend `.env`
-
-### Anthropic
-1. Go to https://console.anthropic.com/
-2. Create API key
-3. Add to backend `.env`
-
-### Together AI
-1. Go to https://api.together.xyz/
-2. Create API key
-3. Add to backend `.env`
-
-## Step 7: Payment Integration (Optional)
-
-### Stripe Setup
-
-```bash
-# Install Stripe CLI
-brew install stripe/stripe-cli/stripe
-
-# Login
-stripe login
-
-# Forward webhooks to local
-stripe listen --forward-to localhost:8000/api/v1/webhooks/stripe
-```
-
-Add to backend:
+**Optional Variables**:
 ```env
-STRIPE_SECRET_KEY=sk_live_your-key
-STRIPE_WEBHOOK_SECRET=whsec_your-secret
+# Redis Cache
+REDIS_URL=redis://localhost:6379
+
+# AWS Services
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+
+# Monitoring
+DATADOG_API_KEY=...
+SENTRY_DSN=...
 ```
 
-## Step 8: Monitoring & Logging
 
-### Option A: Cloud Services
-- AWS CloudWatch
-- Google Cloud Logging
-- Datadog
-- New Relic
 
-### Option B: Self-hosted
+---
+
+## 3. Database Configuration
+
+### 3.1 Local Development
 
 ```bash
-# Install PM2 for logs
-pm2 install pm2-logrotate
+# Create database
+createdb genai_platform
 
-# View logs
-pm2 logs genai-api
-pm2 logs genai-frontend
+# Run migrations
+npm run db:migrate
+
+# Seed initial data
+npm run db:seed
+
+# Verify setup
+psql genai_platform -c "SELECT COUNT(*) FROM users;"
 ```
 
-## Step 9: Backup Strategy
-
-### Database Backups
+### 3.2 Production (AWS RDS)
 
 ```bash
-# Daily backup script
-#!/bin/bash
-DATE=$(date +%Y%m%d_%H%M%S)
-pg_dump genai_platform > /backups/genai_$DATE.sql
-aws s3 cp /backups/genai_$DATE.sql s3://your-backup-bucket/
+# Create RDS instance via Terraform
+cd terraform/environments/production
+terraform init
+terraform plan
+terraform apply
 
-# Add to crontab
-0 2 * * * /path/to/backup-script.sh
+# Get database endpoint
+export DB_ENDPOINT=$(terraform output -raw db_endpoint)
+
+# Run migrations
+DATABASE_URL="postgresql://admin:${DB_PASSWORD}@${DB_ENDPOINT}:5432/genai_platform" \
+  npm run db:migrate
+
+# Seed production data
+DATABASE_URL="postgresql://admin:${DB_PASSWORD}@${DB_ENDPOINT}:5432/genai_platform" \
+  npm run db:seed
 ```
 
-## Step 10: Security Checklist
+### 3.3 Database Backup
 
-- [ ] Enable HTTPS/SSL
-- [ ] Set strong JWT_SECRET (min 32 chars)
-- [ ] Use environment variables (never commit secrets)
-- [ ] Enable database SSL
-- [ ] Configure CORS properly
-- [ ] Set up rate limiting
-- [ ] Enable audit logging
-- [ ] Regular security updates
-- [ ] Database backups
-- [ ] Monitor error logs
+```bash
+# Manual backup
+pg_dump genai_platform > backup_$(date +%Y%m%d).sql
 
-## Performance Optimization
+# Restore from backup
+psql genai_platform < backup_20260202.sql
 
-### Database
-- Enable connection pooling
-- Add indexes for frequent queries
-- Regular VACUUM and ANALYZE
-- Monitor slow queries
-
-### Backend
-- Enable compression
-- Use Redis for caching
-- Load balancing with multiple instances
-- CDN for static assets
-
-### Frontend
-- Enable Next.js image optimization
-- Use CDN for assets
-- Enable caching headers
-- Minimize bundle size
-
-## Scaling Strategy
-
-### Horizontal Scaling
-
-```
-┌─────────────┐
-│ Load        │
-│ Balancer    │
-└──────┬──────┘
-       │
-   ┌───┴───┬───────┬───────┐
-   │       │       │       │
-┌──▼──┐ ┌──▼──┐ ┌──▼──┐ ┌──▼──┐
-│API 1│ │API 2│ │API 3│ │API 4│
-└─────┘ └─────┘ └─────┘ └─────┘
+# AWS RDS automated backups
+# Configured via Terraform (35-day retention)
 ```
 
-### Database Scaling
-- Read replicas for queries
-- Connection pooling (PgBouncer)
-- Partitioning for large tables
-- Caching layer (Redis)
+---
 
-## Cost Estimation
+## 4. Application Deployment
 
-### Small Scale (< 1000 users)
-- Database: $25/month (managed)
-- Backend: $20/month (1 instance)
-- Frontend: $0 (Vercel free tier)
-- LLM APIs: Pay per use
-- **Total: ~$45/month + API costs**
+### 4.1 Local Development
 
-### Medium Scale (1000-10000 users)
-- Database: $100/month
-- Backend: $100/month (3 instances)
-- Frontend: $20/month
-- LLM APIs: Pay per use
-- **Total: ~$220/month + API costs**
+```bash
+# Start development server
+npm run dev
 
-### Large Scale (10000+ users)
-- Database: $500/month (HA setup)
-- Backend: $500/month (auto-scaling)
-- Frontend: $100/month
-- LLM APIs: Pay per use
-- CDN: $50/month
-- **Total: ~$1150/month + API costs**
+# Access application
+open http://localhost:3000
+
+# Run tests
+npm test
+
+# Check for issues
+npm run lint
+```
+
+### 4.2 Docker Build
+
+```bash
+# Build Docker image
+docker build -t agatha-ai:latest .
+
+# Run container locally
+docker run -p 3000:3000 \
+  --env-file .env.local \
+  agatha-ai:latest
+
+# Push to ECR
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin ${ECR_REGISTRY}
+
+docker tag agatha-ai:latest ${ECR_REGISTRY}/agatha-ai:latest
+docker push ${ECR_REGISTRY}/agatha-ai:latest
+```
+
+
+
+### 4.3 AWS ECS Deployment
+
+```bash
+# Deploy via Terraform
+cd terraform/environments/production
+terraform apply -target=module.ecs
+
+# Or use AWS CLI
+aws ecs update-service \
+  --cluster agatha-ai-prod \
+  --service api-gateway \
+  --force-new-deployment
+
+# Monitor deployment
+aws ecs describe-services \
+  --cluster agatha-ai-prod \
+  --services api-gateway
+```
+
+### 4.4 Lambda Functions
+
+```bash
+# Package Lambda function
+cd lambda/inference-worker
+npm install --production
+zip -r function.zip .
+
+# Deploy via AWS CLI
+aws lambda update-function-code \
+  --function-name agatha-ai-inference-worker \
+  --zip-file fileb://function.zip
+
+# Or use Terraform
+terraform apply -target=module.lambda
+```
+
+### 4.5 CI/CD Pipeline
+
+**GitHub Actions Workflow**:
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run tests
+        run: npm test
+      - name: Build Docker image
+        run: docker build -t agatha-ai .
+      - name: Push to ECR
+        run: |
+          aws ecr get-login-password | docker login ...
+          docker push ${ECR_REGISTRY}/agatha-ai:latest
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service --force-new-deployment
+```
+
+---
+
+## 5. Verification & Testing
+
+### 5.1 Health Checks
+
+```bash
+# API health check
+curl https://api.agathaai.com/health
+
+# Expected response:
+# {"status":"healthy","version":"1.0.0","timestamp":"2026-02-02T10:00:00Z"}
+
+# Database connectivity
+curl https://api.agathaai.com/health/db
+
+# Redis connectivity
+curl https://api.agathaai.com/health/redis
+```
+
+### 5.2 Smoke Tests
+
+```bash
+# Test authentication
+curl -X POST https://api.agathaai.com/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"Test123!"}'
+
+# Test inference
+curl -X POST https://api.agathaai.com/api/v1/inference \
+  -H "Authorization: Bearer ${JWT_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"Hello","model":"gpt-3.5-turbo"}'
+
+# Check rate limits
+curl https://api.agathaai.com/api/v1/rate-limit \
+  -H "Authorization: Bearer ${JWT_TOKEN}"
+```
+
+
+
+### 5.3 Load Testing
+
+```bash
+# Install k6
+brew install k6
+
+# Run load test
+k6 run tests/load/inference.js
+
+# Expected results:
+# - 95th percentile < 200ms
+# - Error rate < 0.1%
+# - Throughput > 1000 req/sec
+```
+
+### 5.4 Security Scanning
+
+```bash
+# Dependency vulnerabilities
+npm audit
+
+# Container scanning
+docker scan agatha-ai:latest
+
+# Infrastructure scanning
+terraform plan -out=tfplan
+terraform show -json tfplan | tfsec
+
+# OWASP ZAP scanning
+zap-cli quick-scan https://api.agathaai.com
+```
+
+---
+
+## 6. Production Checklist
+
+### 6.1 Pre-Deployment
+
+- [ ] All tests passing (unit, integration, e2e)
+- [ ] Security scan completed (no critical issues)
+- [ ] Database migrations tested
+- [ ] Environment variables configured
+- [ ] Secrets stored in AWS Secrets Manager
+- [ ] Monitoring dashboards created
+- [ ] Alerts configured
+- [ ] Runbooks updated
+- [ ] Rollback plan documented
+- [ ] Stakeholders notified
+
+### 6.2 Deployment
+
+- [ ] Deploy to staging environment
+- [ ] Run smoke tests on staging
+- [ ] Get approval from QA team
+- [ ] Schedule deployment window
+- [ ] Enable maintenance mode (if needed)
+- [ ] Deploy to production (canary)
+- [ ] Monitor metrics for 15 minutes
+- [ ] Increase traffic to 50%
+- [ ] Monitor metrics for 15 minutes
+- [ ] Increase traffic to 100%
+- [ ] Disable maintenance mode
+
+### 6.3 Post-Deployment
+
+- [ ] Verify all health checks passing
+- [ ] Run smoke tests on production
+- [ ] Check error rates in monitoring
+- [ ] Verify database performance
+- [ ] Check LLM provider connectivity
+- [ ] Review application logs
+- [ ] Update status page
+- [ ] Notify stakeholders of completion
+- [ ] Document any issues encountered
+- [ ] Schedule post-mortem (if needed)
+
+
+
+### 6.4 Rollback Procedures
+
+**Automated Rollback** (triggered by health checks):
+```bash
+# ECS will automatically rollback if:
+# - Health checks fail for 3 consecutive times
+# - Error rate exceeds 5%
+# - Response time exceeds 1000ms
+```
+
+**Manual Rollback**:
+```bash
+# Rollback ECS service
+aws ecs update-service \
+  --cluster agatha-ai-prod \
+  --service api-gateway \
+  --task-definition agatha-ai:PREVIOUS_VERSION
+
+# Rollback database migration
+npm run db:rollback
+
+# Rollback Lambda function
+aws lambda update-function-code \
+  --function-name agatha-ai-inference-worker \
+  --s3-bucket lambda-deployments \
+  --s3-key previous-version.zip
+```
+
+---
 
 ## Troubleshooting
 
-### Database Connection Issues
-```bash
-# Test connection
-psql $DATABASE_URL
+### Common Issues
 
-# Check pool status
-SELECT * FROM pg_stat_activity;
+**Issue**: Database connection timeout
+```bash
+# Check security group rules
+aws ec2 describe-security-groups --group-ids sg-xxx
+
+# Verify database is running
+aws rds describe-db-instances --db-instance-identifier agatha-ai-prod
+
+# Test connectivity
+psql -h ${DB_ENDPOINT} -U admin -d genai_platform
 ```
 
-### API Not Responding
+**Issue**: High memory usage
 ```bash
-# Check logs
-pm2 logs genai-api
+# Check ECS task metrics
+aws ecs describe-tasks --cluster agatha-ai-prod --tasks ${TASK_ARN}
 
-# Restart service
-pm2 restart genai-api
+# Increase task memory
+# Edit terraform/modules/ecs/main.tf
+# Update memory from 4096 to 8192
+terraform apply
 ```
 
-### High Memory Usage
+**Issue**: LLM API errors
 ```bash
-# Monitor
-pm2 monit
+# Check API key validity
+curl https://api.openai.com/v1/models \
+  -H "Authorization: Bearer ${OPENAI_API_KEY}"
 
-# Increase memory limit
-pm2 start dist/index.js --max-memory-restart 1G
+# Check rate limits
+# Review CloudWatch logs for rate limit errors
+
+# Rotate API keys if needed
+aws secretsmanager update-secret \
+  --secret-id openai-api-key \
+  --secret-string "${NEW_API_KEY}"
 ```
 
-## Support
+---
 
-For issues:
-1. Check logs: `pm2 logs`
-2. Review error messages
-3. Check database connectivity
-4. Verify environment variables
-5. Review API key quotas
+## Support & Escalation
 
-## Next Steps
+**Level 1 - On-Call Engineer**:
+- PagerDuty: Primary on-call
+- Response time: 15 minutes
+- Handles: Service degradation, minor incidents
 
-1. ✅ Deploy database
-2. ✅ Deploy backend
-3. ✅ Deploy frontend
-4. ✅ Configure DNS
-5. ✅ Setup SSL
-6. ✅ Add monitoring
-7. ✅ Configure backups
-8. ✅ Load testing
-9. ✅ Security audit
-10. ✅ Go live!
+**Level 2 - Senior Engineer**:
+- PagerDuty: Secondary escalation
+- Response time: 30 minutes
+- Handles: Major incidents, complex issues
+
+**Level 3 - Engineering Manager**:
+- Phone: Emergency only
+- Response time: 1 hour
+- Handles: Critical incidents, executive escalation
+
+---
+
+**Document Classification**: Internal - Operations  
+**Maintained by**: DevOps Team  
+**Last Updated**: February 2, 2026  
+**Version**: 1.0
+

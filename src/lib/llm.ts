@@ -1,9 +1,9 @@
 import OpenAI from 'openai';
-import Anthropic from '@anthropic-ai/sdk';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { query } from './database';
 
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
-const anthropic = process.env.ANTHROPIC_API_KEY ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY }) : null;
+const gemini = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
 
 interface InferenceParams {
   temperature?: number;
@@ -38,14 +38,14 @@ export async function processInference(
       response = result.response;
       tokensPrompt = result.tokensPrompt;
       tokensCompletion = result.tokensCompletion;
-    } else if (model.startsWith('claude-')) {
-      if (!anthropic) throw new Error('Anthropic API key not configured');
-      const result = await callAnthropic(model, prompt, parameters);
+    } else if (model.startsWith('gemini-')) {
+      if (!gemini) throw new Error('Gemini API key not configured');
+      const result = await callGemini(model, prompt, parameters);
       response = result.response;
       tokensPrompt = result.tokensPrompt;
       tokensCompletion = result.tokensCompletion;
-    } else if (model.startsWith('llama-')) {
-      const result = await callTogether(model, prompt, parameters);
+    } else if (model.startsWith('deepseek-')) {
+      const result = await callDeepSeek(model, prompt, parameters);
       response = result.response;
       tokensPrompt = result.tokensPrompt;
       tokensCompletion = result.tokensCompletion;
@@ -96,30 +96,46 @@ async function callOpenAI(model: string, prompt: string, params: InferenceParams
   };
 }
 
-async function callAnthropic(model: string, prompt: string, params: InferenceParams) {
-  const message = await anthropic!.messages.create({
-    model,
-    max_tokens: params.maxTokens || 1000,
-    temperature: params.temperature || 0.7,
-    messages: [{ role: 'user', content: prompt }],
+async function callGemini(model: string, prompt: string, params: InferenceParams) {
+  // Map model names to actual Gemini model IDs
+  const modelMap: Record<string, string> = {
+    'gemini-pro': 'gemini-1.5-flash',
+    'gemini-1.5-pro': 'gemini-1.5-pro',
+    'gemini-1.5-flash': 'gemini-1.5-flash',
+  };
+  
+  const actualModel = modelMap[model] || 'gemini-1.5-flash';
+  const genModel = gemini!.getGenerativeModel({ model: actualModel });
+  
+  const result = await genModel.generateContent({
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: params.temperature || 0.7,
+      maxOutputTokens: params.maxTokens || 1000,
+      topP: params.topP || 1,
+    },
   });
   
-  const content = message.content[0];
-  const responseText = content.type === 'text' ? content.text : '';
+  const response = result.response;
+  const text = response.text();
+  
+  // Gemini doesn't always provide token counts, estimate if needed
+  const tokensPrompt = response.usageMetadata?.promptTokenCount || Math.ceil(prompt.length / 4);
+  const tokensCompletion = response.usageMetadata?.candidatesTokenCount || Math.ceil(text.length / 4);
   
   return {
-    response: responseText,
-    tokensPrompt: message.usage.input_tokens,
-    tokensCompletion: message.usage.output_tokens,
+    response: text,
+    tokensPrompt,
+    tokensCompletion,
   };
 }
 
-async function callTogether(model: string, prompt: string, params: InferenceParams) {
-  const response = await fetch('https://api.together.xyz/v1/chat/completions', {
+async function callDeepSeek(model: string, prompt: string, params: InferenceParams) {
+  const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.TOGETHER_API_KEY}`,
+      'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
     },
     body: JSON.stringify({
       model,
@@ -131,7 +147,8 @@ async function callTogether(model: string, prompt: string, params: InferencePara
   });
   
   if (!response.ok) {
-    throw new Error(`Together API error: ${response.statusText}`);
+    const errorText = await response.text();
+    throw new Error(`DeepSeek API error: ${response.statusText} - ${errorText}`);
   }
   
   const data = await response.json();

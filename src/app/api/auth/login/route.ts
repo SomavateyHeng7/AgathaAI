@@ -60,19 +60,24 @@ export async function POST(request: NextRequest) {
       { expiresIn: '7d' }
     );
     
+    // Get IP address from headers
+    const ipAddress = request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip') || 
+                     'unknown';
+    
     // Create session
     const sessionToken = require('crypto').randomBytes(32).toString('hex');
     await query(
       `INSERT INTO user_sessions (user_id, token, ip_address, user_agent, expires_at)
        VALUES ($1, $2, $3, $4, NOW() + INTERVAL '7 days')`,
-      [user.id, sessionToken, request.ip || 'unknown', request.headers.get('user-agent')]
+      [user.id, sessionToken, ipAddress, request.headers.get('user-agent')]
     );
     
     // Audit log
     await query(
       `INSERT INTO audit_logs (user_id, action, resource_type, ip_address)
        VALUES ($1, 'user.login', 'user', $2)`,
-      [user.id, request.ip || 'unknown']
+      [user.id, ipAddress]
     );
     
     return NextResponse.json({

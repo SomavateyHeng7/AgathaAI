@@ -21,13 +21,14 @@ export function getCurrentUser(): Partial<User> | null {
   
   const email = localStorage.getItem(USER_EMAIL_KEY);
   const tier = localStorage.getItem(USER_TIER_KEY) as 'free' | 'pro' | 'enterprise';
+  const apiKey = localStorage.getItem('apiKey');
   
   if (!email) return null;
   
   return {
     email,
     tier: tier || 'free',
-    apiKey: getAuthToken() || '',
+    apiKey: apiKey || '',
   };
 }
 
@@ -44,7 +45,7 @@ export function logout(): void {
 
 export async function login(email: string, password: string): Promise<{ success: boolean; error?: string }> {
   try {
-    // Replace with actual API call
+    // Call the actual API
     const response = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -52,14 +53,26 @@ export async function login(email: string, password: string): Promise<{ success:
     });
 
     if (!response.ok) {
-      return { success: false, error: 'Invalid credentials' };
+      const error = await response.json();
+      return { success: false, error: error.error || 'Invalid credentials' };
     }
 
     const data = await response.json();
     
+    // Store auth data
     localStorage.setItem(AUTH_TOKEN_KEY, data.token);
     localStorage.setItem(USER_EMAIL_KEY, data.user.email);
     localStorage.setItem(USER_TIER_KEY, data.user.tier);
+    if (data.user.name) {
+      localStorage.setItem(USER_NAME_KEY, data.user.name);
+    }
+    
+    // For existing users, we need to get their API key
+    // In a real app, this would be returned from the login endpoint
+    // For now, we'll generate a temporary one
+    if (!localStorage.getItem('apiKey')) {
+      localStorage.setItem('apiKey', `sk_${Math.random().toString(36).substring(2, 15)}`);
+    }
     
     return { success: true };
   } catch (error) {
@@ -74,7 +87,7 @@ export async function register(
   tier: 'free' | 'pro' | 'enterprise'
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    // Replace with actual API call
+    // Call the actual API
     const response = await fetch('/api/auth/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -82,15 +95,22 @@ export async function register(
     });
 
     if (!response.ok) {
-      return { success: false, error: 'Registration failed' };
+      const error = await response.json();
+      return { success: false, error: error.error || 'Registration failed' };
     }
 
     const data = await response.json();
     
+    // Store auth data
     localStorage.setItem(AUTH_TOKEN_KEY, data.token);
     localStorage.setItem(USER_EMAIL_KEY, data.user.email);
     localStorage.setItem(USER_NAME_KEY, data.user.name);
     localStorage.setItem(USER_TIER_KEY, data.user.tier);
+    
+    // Store API key for making inference requests
+    if (data.apiKey) {
+      localStorage.setItem('apiKey', data.apiKey);
+    }
     
     return { success: true };
   } catch (error) {

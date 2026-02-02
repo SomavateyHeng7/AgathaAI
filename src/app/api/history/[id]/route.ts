@@ -4,7 +4,7 @@ import { authenticateToken } from '@/lib/auth-server';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await authenticateToken(request);
@@ -15,9 +15,11 @@ export async function DELETE(
       );
     }
     
+    const { id } = await params;
+    
     const result = await query(
       'DELETE FROM inference_requests WHERE id = $1 AND user_id = $2 RETURNING id',
-      [params.id, user.id]
+      [id, user.id]
     );
     
     if (result.rows.length === 0) {

@@ -51,9 +51,11 @@ export default function ChatInterface({ onSubmit, messages, isProcessing }: Chat
           >
             <option>GPT-4</option>
             <option>GPT-3.5 Turbo</option>
-            <option>Claude 3 Opus</option>
-            <option>Claude 3 Sonnet</option>
-            <option>Llama 3 70B</option>
+            <option>GPT-4o</option>
+            <option>Gemini Pro</option>
+            <option>Gemini 1.5 Pro</option>
+            <option>DeepSeek Chat</option>
+            <option>DeepSeek Coder</option>
           </select>
         </div>
 

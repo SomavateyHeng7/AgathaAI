@@ -62,10 +62,14 @@ export async function POST(request: NextRequest) {
     );
     
     // Audit log
+    const ipAddress = request.headers.get('x-forwarded-for') || 
+                     request.headers.get('x-real-ip') || 
+                     'unknown';
+    
     await query(
       `INSERT INTO audit_logs (user_id, action, resource_type, ip_address)
        VALUES ($1, 'user.registered', 'user', $2)`,
-      [user.id, request.ip || 'unknown']
+      [user.id, ipAddress]
     );
     
     return NextResponse.json({

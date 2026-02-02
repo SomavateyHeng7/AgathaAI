@@ -55,12 +55,41 @@ export default function Home() {
     setMessages(prev => [...prev, userMessage]);
     setIsProcessing(true);
 
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      // Map UI model names to API model names
+      const modelMap: Record<string, string> = {
+        'GPT-4': 'gpt-4',
+        'GPT-3.5 Turbo': 'gpt-3.5-turbo',
+        'GPT-4o': 'gpt-4o',
+        'Gemini Pro': 'gemini-1.5-flash',
+        'Gemini 1.5 Pro': 'gemini-1.5-pro',
+        'DeepSeek Chat': 'deepseek-chat',
+        'DeepSeek Coder': 'deepseek-coder',
+      };
+
+      const apiModel = modelMap[model] || 'gpt-3.5-turbo';
+
+      // Import API client
+      const { apiClient } = await import('@/lib/api-client');
+
+      // Submit inference request
+      const inferenceRequest = await apiClient.submitInference({
+        prompt,
+        model: apiModel,
+        parameters: {
+          temperature: 0.7,
+          maxTokens: 2000,
+        },
+      });
+
+      // Poll for result
+      const response = await apiClient.pollForResult(inferenceRequest.id);
+
+      // Add assistant message
       const assistantMessage: Message = {
-        id: `msg_${Date.now()}_response`,
+        id: inferenceRequest.id,
         role: 'assistant',
-        content: `This is a simulated response from ${model}. In production, this would be the actual model output based on your prompt.\n\nThe response would include detailed information, code examples, explanations, or whatever you requested. The LLM would process your request through the API gateway, handle rate limiting, and return the result securely.`,
+        content: response,
         model,
         timestamp: new Date(),
       };
@@ -72,7 +101,7 @@ export default function Home() {
       const historyItem: PromptHistory = {
         id: userMessage.id,
         prompt,
-        response: assistantMessage.content,
+        response: response,
         model: model.toLowerCase().replace(/\s+/g, '-'),
         status: 'completed',
         tokensUsed: Math.floor(Math.random() * 500) + 100,
@@ -81,7 +110,21 @@ export default function Home() {
       };
       
       setHistory(prev => [historyItem, ...prev]);
-    }, 2000);
+    } catch (error) {
+      console.error('Error:', error);
+      
+      // Add error message
+      const errorMessage: Message = {
+        id: `msg_${Date.now()}_error`,
+        role: 'assistant',
+        content: `Error: ${error instanceof Error ? error.message : 'Failed to get response'}.\n\nPlease make sure:\n1. Your API keys are configured in .env.local\n2. The database is running\n3. The backend server is running\n\nFor setup instructions, see CHAT_INTEGRATION_GUIDE.md`,
+        model,
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+      setIsProcessing(false);
+    }
   };
 
   const handleNewChat = () => {
