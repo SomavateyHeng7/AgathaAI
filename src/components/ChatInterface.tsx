@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import type { PromptHistory } from "@/types";
+import Dialog from "./Dialog";
 
 interface Message {
   id: string;
@@ -24,6 +25,8 @@ export default function ChatInterface({
 }: ChatInterfaceProps) {
   const [input, setInput] = useState("");
   const [selectedModel, setSelectedModel] = useState("GPT-4");
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showProfileDialog, setShowProfileDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -64,7 +67,11 @@ export default function ChatInterface({
         </div>
 
         <div className="flex items-center gap-3">
-          <button className="rounded-lg p-2 text-gray-400 hover:bg-gray-800 hover:text-white">
+          <button 
+            onClick={() => setShowSettingsDialog(true)}
+            className="rounded-lg p-2 text-gray-400 hover:bg-gray-800 hover:text-white"
+            title="Settings"
+          >
             <svg
               className="h-5 w-5"
               fill="none"
@@ -85,7 +92,11 @@ export default function ChatInterface({
               />
             </svg>
           </button>
-          <button className="rounded-lg p-2 text-gray-400 hover:bg-gray-800 hover:text-white">
+          <button 
+            onClick={() => setShowProfileDialog(true)}
+            className="rounded-lg p-2 text-gray-400 hover:bg-gray-800 hover:text-white"
+            title="Profile"
+          >
             <svg
               className="h-5 w-5"
               fill="none"
@@ -102,6 +113,159 @@ export default function ChatInterface({
           </button>
         </div>
       </div>
+
+      {/* Settings Dialog */}
+      <Dialog
+        isOpen={showSettingsDialog}
+        onClose={() => setShowSettingsDialog(false)}
+        title="Chat Settings"
+        size="md"
+        actions={
+          <button
+            onClick={() => setShowSettingsDialog(false)}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          >
+            Save Changes
+          </button>
+        }
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-300">
+              Default Model
+            </label>
+            <select
+              value={selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option>GPT-4</option>
+              <option>GPT-3.5 Turbo</option>
+              <option>GPT-4o</option>
+              <option>Gemini Pro</option>
+              <option>Gemini 1.5 Pro</option>
+              <option>DeepSeek Chat</option>
+              <option>DeepSeek Coder</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-300">
+              Temperature
+            </label>
+            <input
+              type="range"
+              min="0"
+              max="2"
+              step="0.1"
+              defaultValue="0.7"
+              className="w-full"
+            />
+            <div className="mt-1 flex justify-between text-xs text-gray-500">
+              <span>Precise</span>
+              <span>Balanced</span>
+              <span>Creative</span>
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-300">
+              Max Response Length
+            </label>
+            <select className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500">
+              <option>Short (256 tokens)</option>
+              <option>Medium (512 tokens)</option>
+              <option>Long (1024 tokens)</option>
+              <option>Very Long (2048 tokens)</option>
+            </select>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-300">Stream Responses</p>
+              <p className="text-xs text-gray-500">Show responses as they generate</p>
+            </div>
+            <label className="relative inline-flex cursor-pointer items-center">
+              <input type="checkbox" defaultChecked className="peer sr-only" />
+              <div className="peer h-6 w-11 rounded-full bg-gray-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500"></div>
+            </label>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-300">Save Chat History</p>
+              <p className="text-xs text-gray-500">Store conversations for later</p>
+            </div>
+            <label className="relative inline-flex cursor-pointer items-center">
+              <input type="checkbox" defaultChecked className="peer sr-only" />
+              <div className="peer h-6 w-11 rounded-full bg-gray-700 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-blue-600 peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500"></div>
+            </label>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Profile Dialog */}
+      <Dialog
+        isOpen={showProfileDialog}
+        onClose={() => setShowProfileDialog(false)}
+        title="User Profile"
+        size="md"
+        actions={
+          <button
+            onClick={() => setShowProfileDialog(false)}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+          >
+            Close
+          </button>
+        }
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-2xl font-bold text-white">
+              U
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white">User Account</h3>
+              <p className="text-sm text-gray-400">user@example.com</p>
+            </div>
+          </div>
+
+          <div className="space-y-3 rounded-lg bg-gray-800 p-4">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-400">Account Type</span>
+              <span className="rounded-full bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-400">
+                PRO
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-400">Member Since</span>
+              <span className="text-sm text-white">January 2026</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-400">Total Requests</span>
+              <span className="text-sm text-white">1,234</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-400">API Key</span>
+              <button className="text-sm text-blue-400 hover:text-blue-300">
+                View & Manage
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <button className="w-full rounded-lg border border-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
+              Edit Profile
+            </button>
+            <button className="w-full rounded-lg border border-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
+              Change Password
+            </button>
+            <button className="w-full rounded-lg border border-gray-700 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800">
+              Billing & Subscription
+            </button>
+          </div>
+        </div>
+      </Dialog>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto">

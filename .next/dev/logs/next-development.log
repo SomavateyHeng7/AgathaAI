@@ -1,37 +1,14 @@
-[00:00:00.733] Server  LOG     ✓ Ready in 544ms
-[00:00:03.595] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:19.706] Server  ERROR   [next-auth][error][OAUTH_CALLBACK_HANDLER_ERROR] "\nhttps://next-auth.js.org/errors#oauth_callback_handler_error" "access_denied" {}
-[00:00:19.707] Server  ERROR   [next-auth][error][OAUTH_CALLBACK_ERROR] "\nhttps://next-auth.js.org/errors#oauth_callback_error" "access_denied" {}
-[00:00:19.942] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:42.539] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:50.154] Server  ERROR   Database query error: error: password authentication failed for user "postgres"
-[00:00:50.196] Server  ERROR   Google sign-in error: error: password authentication failed for user "postgres"
-[00:00:50.196] Server  ERROR   Error details: "{\n  \"length\": 104,\n  \"name\": \"error\",\n  \"severity\": \"FATAL\",\n  \"code\": \"28P01\",\n  \"file\": \"auth.c\",\n  \"line\": \"343\",\n  \"routine\": \"auth_failed\"\n}"
-[00:00:50.391] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:56.955] Server  LOG       Reload env: .env
-[00:02:05.505] Server  LOG       Reload env: .env
-[00:02:06.635] Server  LOG       Reload env: .env
-[00:02:10.066] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:02:11.686] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:02:12.019] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:02:17.674] Server  LOG     Executed query {}
-[00:02:17.674] Server  LOG     Creating new user: "u6530354@au.edu"
-[00:02:17.681] Server  LOG     Executed query {}
-[00:02:17.681] Server  LOG     User created with ID: "9b1463ef-10e8-4994-a7d8-5599d8ca07cd"
-[00:02:17.749] Server  LOG     Executed query {}
-[00:02:17.751] Server  LOG     Executed query {}
-[00:02:17.752] Server  LOG     Executed query {}
-[00:02:17.962] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:02:18.516] Server  LOG     Executed query {}
-[00:02:18.529] Server  LOG     Executed query {}
-[00:02:40.663] Server  LOG     Executed query {}
-[00:02:40.667] Server  LOG     Executed query {}
-[00:02:40.677] Server  LOG     Executed query {}
-[00:02:42.138] Server  LOG     Executed query {}
-[00:02:42.144] Server  LOG     Executed query {}
-[00:02:42.172] Server  LOG     Executed query {}
-[00:03:08.697] Server  LOG     Executed query {}
-[00:03:08.702] Server  LOG     Executed query {}
-[00:03:18.251] Server  LOG     Executed query {}
-[00:03:18.254] Server  LOG     Executed query {}
-[00:04:02.565] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:00.957] Server  LOG     ✓ Ready in 736ms
+[00:01:11.507] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:25.528] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:32.164] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:39.001] Server  LOG     Executed query {}
+[00:01:39.002] Server  LOG     Creating new user: "phewphew0407@gmail.com"
+[00:01:39.055] Server  LOG     Executed query {}
+[00:01:39.055] Server  LOG     User created with ID: "beb78017-5158-4636-9493-9e0b5bd34668"
+[00:01:39.246] Server  LOG     Executed query {}
+[00:01:39.295] Server  LOG     Executed query {}
+[00:01:39.344] Server  LOG     Executed query {}
+[00:01:39.552] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:01:39.722] Server  LOG     Executed query {}
+[00:01:39.776] Server  LOG     Executed query {}

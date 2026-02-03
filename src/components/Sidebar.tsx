@@ -26,6 +26,13 @@ export default function Sidebar({ user, history, onSelectHistory, onNewChat }: S
 
   const models = [
     { 
+      id: 'gpt-5.2-codex', 
+      name: 'GPT-5.2-Codex', 
+      description: 'Advanced code generation and analysis model',
+      icon: '🤖',
+      tier: 'free'
+    },
+    { 
       id: 'gpt-4', 
       name: 'GPT-4', 
       description: 'Most capable model, best for complex tasks',
