@@ -5,8 +5,8 @@ Enterprise-grade platform for accessing multiple Large Language Models through a
 ## 🚀 Features
 
 ### Core Capabilities
-- ✅ **Multi-Model Support** - OpenAI (GPT-4, GPT-4o, GPT-3.5), Google Gemini (Pro, 1.5 Pro, 1.5 Flash), DeepSeek (Chat, Coder)
-- ✅ **Subscription Management** - Stripe-powered upgrades from Free to Pro ($29/mo) or Enterprise ($299/mo)
+- ✅ **Multi-Model Support** - OpenAI (GPT-4, GPT-4o, GPT-3.5), Google Gemini (Pro, 1.5 Pro, 1.5 Flash)
+- ✅ **Subscription Management** - Stripe-powered upgrades from Free to Pro ($20/mo) or Enterprise ($99/mo)
 - ✅ **Payment Processing** - Secure checkout, customer portal, webhook handling
 - ✅ **Rate Limiting** - Tier-based requests per minute and concurrent request limits
 - ✅ **Authentication** - JWT tokens, API keys, and Google OAuth for secure access
@@ -91,8 +91,8 @@ See [docs/NEXTJS_SETUP.md](docs/NEXTJS_SETUP.md) for detailed setup instructions
 | Tier | Monthly Pricing | Rate Limits | Features | Target User |
 |------|----------------|-------------|----------|-------------|
 | **Free** | $0 / forever | 10 req/min<br>100K tokens/month<br>2 concurrent | GPT-3.5 Turbo<br>7 days retention<br>Community support | Product discovery |
-| **Pro** | $29 / month | 100 req/min<br>1M tokens/month<br>10 concurrent | GPT-4, GPT-4o, Gemini Pro<br>30 days retention<br>Priority support<br>API access | Power users |
-| **Enterprise** | $299 / month | 10,000 req/min<br>Unlimited tokens<br>500 concurrent | All models (GPT-4, Claude, Gemini, DeepSeek)<br>Unlimited retention<br>Dedicated support<br>Custom integrations<br>SLA guarantee | Teams & orgs |
+| **Pro** | $20 / month | 100 req/min<br>1M tokens/month<br>10 concurrent | GPT-4, GPT-4o, Gemini Pro<br>30 days retention<br>Priority support<br>API access | Power users |
+| **Enterprise** | $99 / month | 10,000 req/min<br>Unlimited tokens<br>500 concurrent | All models (GPT-4, Claude, Gemini, DeepSeek)<br>Unlimited retention<br>Dedicated support<br>Custom integrations<br>SLA guarantee | Teams & orgs |
 
 **Upgrade anytime at `/subscribe` with Stripe-powered checkout!**
 
@@ -196,43 +196,6 @@ agatha-ai/
 - ✅ Input validation with Zod
 - ✅ Password hashing with bcrypt (10 rounds)
 
-## 📚 Documentation
-
-All documentation is in the `docs/` folder:
-
-### 🎯 Enterprise Proposal (NEW!)
-- **[PROPOSAL_SUMMARY.md](PROPOSAL_SUMMARY.md)** - Proposal overview ⭐
-- **[docs/ENTERPRISE_PROPOSAL.md](docs/ENTERPRISE_PROPOSAL.md)** - Complete architecture proposal
-- **[docs/ARCHITECTURE_DIAGRAMS.md](docs/ARCHITECTURE_DIAGRAMS.md)** - Visual architecture diagrams
-
-### Essential Guides
-- **[docs/NEXTJS_SETUP.md](docs/NEXTJS_SETUP.md)** - Complete Next.js setup guide
-- **[docs/STRIPE_SETUP_GUIDE.md](docs/STRIPE_SETUP_GUIDE.md)** - Stripe integration setup ⭐
-- **[docs/SUBSCRIPTION_FEATURE.md](docs/SUBSCRIPTION_FEATURE.md)** - Subscription feature docs ⭐
-- **[docs/NEXTJS_MIGRATION.md](docs/NEXTJS_MIGRATION.md)** - Express to Next.js migration
-- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design and data flow
-- **[docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)** - Production deployment
-- **[docs/GO_LIVE_CHECKLIST.md](docs/GO_LIVE_CHECKLIST.md)** - Launch checklist
-
-### Reference
-- **[docs/INDEX.md](docs/INDEX.md)** - Complete documentation index
-- **[docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md)** - Feature status
-- **[docs/FEATURE_CHECKLIST.md](docs/FEATURE_CHECKLIST.md)** - Feature verification
-- **[docs/IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md)** - Complete summary
-- **[database/README.md](database/README.md)** - Database setup
-
-## 🧪 Demo Users
-
-All demo users have password: `Demo123!`
-
-- `demo.free@genai.com` - Free tier (10 req/min, 2 concurrent, 7 days retention)
-- `demo.pro@genai.com` - Pro tier (100 req/min, 10 concurrent, 30 days retention)
-- `demo.plus@genai.com` - Plus tier (500 req/min, 25 concurrent, 90 days retention)
-- `demo.enterprise@genai.com` - Enterprise tier (10,000 req/min, 50 concurrent, unlimited retention)
-
-## 🚀 Deployment
-
-See [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) for complete production deployment instructions.
 
 ### Quick Deploy Options
 
