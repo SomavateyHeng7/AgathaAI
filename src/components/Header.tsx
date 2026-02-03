@@ -1,6 +1,7 @@
 'use client';
 
 import type { User } from '@/types';
+import { ThemeToggle } from './ThemeToggle';
 
 interface HeaderProps {
   user: User;
@@ -14,7 +15,7 @@ export default function Header({ user }: HeaderProps) {
   };
 
   return (
-    <header className="border-b border-gray-200 bg-white">
+    <header className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
       <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -22,18 +23,19 @@ export default function Header({ user }: HeaderProps) {
               <span className="text-xl font-bold text-white">AI</span>
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">GenAI Platform</h1>
-              <p className="text-sm text-gray-500">LLM-as-a-Service</p>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">GenAI Platform</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">LLM-as-a-Service</p>
             </div>
           </div>
           
           <div className="flex items-center gap-4">
+            <ThemeToggle />
             <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase ${tierColors[user.tier]}`}>
               {user.tier}
             </span>
             <div className="text-right">
-              <p className="text-sm font-medium text-gray-900">{user.email}</p>
-              <p className="text-xs text-gray-500">API Key: {user.apiKey.slice(0, 12)}...</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{user.email}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">API Key: {user.apiKey.slice(0, 12)}...</p>
             </div>
           </div>
         </div>

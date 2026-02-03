@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export interface Message {
   id: string;
@@ -25,9 +25,9 @@ function reviveMessages(messages: any[]): Message[] {
   }));
 }
 
-export const useChatStore = create<ChatState>(
+export const useChatStore = create<ChatState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       messages: [],
       history: [],
       setMessages: (messages) => set({ messages }),
@@ -38,14 +38,11 @@ export const useChatStore = create<ChatState>(
     }),
     {
       name: "chat-storage",
-      merge: (persistedState, currentState) => {
-        if (!persistedState) return currentState;
-        return {
-          ...currentState,
-          ...persistedState,
-          messages: reviveMessages((persistedState as any).messages || []),
-        };
-      },
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        messages: state.messages,
+        history: state.history,
+      }),
     },
   ),
 );

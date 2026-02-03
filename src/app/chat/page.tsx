@@ -3,6 +3,8 @@
 import { useState, useRef, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 
 interface Message {
   id: string;
@@ -199,15 +201,15 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gray-950">
+    <div className="flex h-screen bg-white dark:bg-gray-950">
       {/* Sidebar */}
       <div
-        className={`${sidebarOpen ? "w-64" : "w-0"} border-r border-gray-800 bg-gray-900 transition-all duration-300 overflow-hidden flex flex-col`}
+        className={`${sidebarOpen ? "w-64" : "w-0"} border-r border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 transition-all duration-300 overflow-hidden flex flex-col`}
       >
-        <div className="p-4 border-b border-gray-800">
+        <div className="p-4 border-gray-200 dark:border-gray-800">
           <button
             onClick={startNewChat}
-            className="w-full flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-200"
+            className="w-full flex items-center gap-2 rounded-lg bg-blue-600 dark:bg-white px-4 py-2.5 text-sm font-medium text-white dark:text-gray-900 hover:bg-blue-700 dark:hover:bg-gray-200"
           >
             <svg
               className="h-5 w-5"
@@ -227,17 +229,17 @@ export default function ChatPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-3">
-          <h3 className="mb-2 px-2 text-xs font-semibold text-gray-400 uppercase">
+          <h3 className="mb-2 px-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
             Recent Chats
           </h3>
           {conversations.map((conv) => (
             <div key={conv.id} className="group relative mb-1">
               <button
                 onClick={() => loadConversation(conv.id)}
-                className={`w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-800 ${
+                className={`w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-200 dark:hover:bg-gray-800 ${
                   currentConversationId === conv.id
-                    ? "bg-gray-800 text-white"
-                    : "text-gray-300"
+                    ? "bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white"
+                    : "text-gray-700 dark:text-gray-300"
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -256,16 +258,16 @@ export default function ChatPage() {
                   </svg>
                   <span className="flex-1 truncate">{conv.title}</span>
                 </div>
-                <div className="mt-1 text-xs text-gray-500">
+                <div className="mt-1 text-xs text-gray-500 dark:text-gray-500">
                   {conv.message_count} messages · {conv.model}
                 </div>
               </button>
               <button
                 onClick={() => deleteConversation(conv.id)}
-                className="absolute right-2 top-2 hidden rounded p-1 hover:bg-gray-700 group-hover:block"
+                className="absolute right-2 top-2 hidden rounded p-1 hover:bg-gray-300 dark:hover:bg-gray-700 group-hover:block"
               >
                 <svg
-                  className="h-4 w-4 text-gray-400"
+                  className="h-4 w-4 text-gray-600 dark:text-gray-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -283,22 +285,22 @@ export default function ChatPage() {
         </div>
 
         {/* User Profile */}
-        <div className="border-t border-gray-800 p-3">
+        <div className="border-t border-gray-200 dark:border-gray-800 p-3">
           <div className="flex items-center gap-2 rounded-lg px-2 py-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-sm font-semibold text-white">
               {session?.user?.name?.[0] || session?.user?.email?.[0] || "U"}
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium text-white">
+              <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
                 {session?.user?.name || "User"}
               </p>
-              <p className="truncate text-xs text-gray-400">
+              <p className="truncate text-xs text-gray-500 dark:text-gray-400">
                 {(session?.user as any)?.tier || "free"}
               </p>
             </div>
             <button
               onClick={() => signOut({ callbackUrl: "/signin" })}
-              className="rounded-lg p-2 text-gray-400 hover:bg-gray-800 hover:text-white"
+              className="rounded-lg p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
               title="Sign out"
             >
               <svg
@@ -322,11 +324,11 @@ export default function ChatPage() {
       {/* Main Chat Area */}
       <div className="flex flex-1 flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-800 px-6 py-4">
+        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-800 px-6 py-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="rounded-lg p-2 text-gray-400 hover:bg-gray-800 hover:text-white"
+              className="rounded-lg p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
             >
               <svg
                 className="h-5 w-5"
@@ -346,7 +348,7 @@ export default function ChatPage() {
             <select
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
-              className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-sm text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-1.5 text-sm text-gray-900 dark:text-white focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
               {modelOptions.map((model) => (
                 <option key={model.value} value={model.value}>
@@ -357,7 +359,8 @@ export default function ChatPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-400">GenAI Platform</span>
+            <ThemeToggle />
+            <span className="text-sm text-gray-600 dark:text-gray-400">GenAI Platform</span>
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-bold text-white">
               AI
             </div>
@@ -368,7 +371,7 @@ export default function ChatPage() {
         <div className="flex-1 overflow-y-auto">
           {messages.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center px-4">
-              <h1 className="mb-8 text-4xl font-semibold text-white">
+              <h1 className="mb-8 text-4xl font-semibold text-gray-900 dark:text-white">
                 What's on your mind today?
               </h1>
 
@@ -394,12 +397,12 @@ export default function ChatPage() {
                   <button
                     key={idx}
                     onClick={() => setInput(suggestion.title)}
-                    className="rounded-xl border border-gray-800 bg-gray-900 p-4 text-left hover:bg-gray-800"
+                    className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-4 text-left hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white">
                       {suggestion.title}
                     </p>
-                    <p className="mt-1 text-xs text-gray-400">
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                       {suggestion.subtitle}
                     </p>
                   </button>
@@ -420,13 +423,13 @@ export default function ChatPage() {
                         AI
                       </div>
                     )}
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
                       {message.role === "user"
                         ? "You"
                         : message.model || "Assistant"}
                     </span>
                   </div>
-                  <div className="ml-11 whitespace-pre-wrap text-gray-300">
+                  <div className="ml-11 whitespace-pre-wrap text-gray-700 dark:text-gray-300">
                     {message.content}
                   </div>
                 </div>
@@ -438,21 +441,21 @@ export default function ChatPage() {
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-600 text-sm font-bold text-white">
                       AI
                     </div>
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-semibold text-gray-900 dark:text-white">
                       {selectedModel}
                     </span>
                   </div>
-                  <div className="ml-11 flex items-center gap-2 text-gray-400">
+                  <div className="ml-11 flex items-center gap-2 text-gray-500 dark:text-gray-400">
                     <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+                      className="h-2 w-2 animate-bounce rounded-full bg-gray-500 dark:bg-gray-400"
                       style={{ animationDelay: "0ms" }}
                     ></div>
                     <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+                      className="h-2 w-2 animate-bounce rounded-full bg-gray-500 dark:bg-gray-400"
                       style={{ animationDelay: "150ms" }}
                     ></div>
                     <div
-                      className="h-2 w-2 animate-bounce rounded-full bg-gray-400"
+                      className="h-2 w-2 animate-bounce rounded-full bg-gray-500 dark:bg-gray-400"
                       style={{ animationDelay: "300ms" }}
                     ></div>
                   </div>
@@ -465,22 +468,22 @@ export default function ChatPage() {
         </div>
 
         {/* Input */}
-        <div className="border-t border-gray-800 p-4">
+        <div className=" border-gray-200 dark:border-gray-800 p-4">
           <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
-            <div className="relative flex items-center gap-3 rounded-2xl border border-gray-700 bg-gray-900 px-4 py-3 focus-within:border-gray-600">
+            <div className="relative flex items-center gap-3 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-3 focus-within:border-blue-500 dark:focus-within:border-gray-600">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask anything"
-                className="flex-1 bg-transparent text-white placeholder-gray-500 focus:outline-none"
+                className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none"
                 disabled={isProcessing}
               />
 
               <button
                 type="submit"
                 disabled={!input.trim() || isProcessing}
-                className="rounded-lg bg-white p-2 text-gray-900 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-lg bg-blue-600 dark:bg-white p-2 text-white dark:text-gray-900 hover:bg-blue-700 dark:hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg
                   className="h-5 w-5"
@@ -497,7 +500,7 @@ export default function ChatPage() {
                 </svg>
               </button>
             </div>
-            <p className="mt-2 text-center text-xs text-gray-500">
+            <p className="mt-2 text-center text-xs text-gray-500 dark:text-gray-500">
               AgathaAI Platform can make mistakes. Check important info.
             </p>
           </form>
@@ -514,13 +517,13 @@ export default function ChatPage() {
           }}
         >
           <div
-            className="w-full max-w-md rounded-2xl bg-[#2f2f2f] p-6 shadow-2xl"
+            className="w-full max-w-md rounded-2xl bg-white dark:bg-[#2f2f2f] p-6 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="mb-3 text-lg font-semibold text-white">
+            <h3 className="mb-3 text-lg font-semibold text-gray-900 dark:text-white">
               Delete chat?
             </h3>
-            <p className="mb-2 text-sm text-gray-300">
+            <p className="mb-2 text-sm text-gray-700 dark:text-gray-300">
               This will delete{" "}
               <strong>
                 {conversations.find((c) => c.id === conversationToDelete)
@@ -528,7 +531,7 @@ export default function ChatPage() {
               </strong>
               .
             </p>
-            <p className="mb-6 text-sm text-gray-400">
+            <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
               Visit settings to delete any memories saved during this chat.
             </p>
             <div className="flex justify-end gap-2">
@@ -537,7 +540,7 @@ export default function ChatPage() {
                   setDeleteDialogOpen(false);
                   setConversationToDelete(null);
                 }}
-                className="rounded-lg px-4 py-2.5 text-sm font-medium text-white hover:bg-[#3f3f3f] transition-colors"
+                className="rounded-lg px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-white hover:bg-gray-100 dark:hover:bg-[#3f3f3f] transition-colors"
               >
                 Cancel
               </button>

@@ -1,14 +1,96 @@
-[00:00:00.957] Server  LOG     ✓ Ready in 736ms
-[00:01:11.507] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:25.528] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:32.164] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:39.001] Server  LOG     Executed query {}
-[00:01:39.002] Server  LOG     Creating new user: "phewphew0407@gmail.com"
-[00:01:39.055] Server  LOG     Executed query {}
-[00:01:39.055] Server  LOG     User created with ID: "beb78017-5158-4636-9493-9e0b5bd34668"
-[00:01:39.246] Server  LOG     Executed query {}
-[00:01:39.295] Server  LOG     Executed query {}
-[00:01:39.344] Server  LOG     Executed query {}
-[00:01:39.552] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:01:39.722] Server  LOG     Executed query {}
-[00:01:39.776] Server  LOG     Executed query {}
+[00:00:00.943] Server  LOG     ✓ Ready in 728ms
+[00:00:02.023] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:07.494] Server  LOG     Executed query {}
+[00:00:07.495] Server  LOG     Existing user found: "phewphew0407@gmail.com"
+[00:00:07.550] Server  LOG     Executed query {}
+[00:00:07.613] Server  LOG     Executed query {}
+[00:00:07.791] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:08.002] Server  LOG     Executed query {}
+[00:00:08.094] Server  LOG     Executed query {}
+[00:01:17.841] Server  LOG     ✓ Compiled in 650ms
+[00:01:37.448] Server  LOG     ✓ Compiled in 201ms
+[00:03:24.458] Server  LOG     ✓ Compiled in 56ms
+[00:03:24.787] Browser ERROR   ./src/app/chat/page.tsx:9:1
+Parsing ecmascript source code failed
+   7 | import 
+   8 |
+>  9 | interface Message {
+     | ^^^^^^^^^
+  10 |   id: string;
+  11 |   role: "user" | "assistant";
+  12 |   content: string;
+
+Expected 'from', got 'interface'
+
+Import traces:
+  Client Component Browser:
+    ./src/app/chat/page.tsx [Client Component Browser]
+    ./src/app/chat/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/chat/page.tsx [Client Component SSR]
+    ./src/app/chat/page.tsx [Server Component]
+[00:03:29.787] Browser ERROR   ./src/app/chat/page.tsx:9:1
+Parsing ecmascript source code failed
+   7 | import {Theme}
+   8 |
+>  9 | interface Message {
+     | ^^^^^^^^^
+  10 |   id: string;
+  11 |   role: "user" | "assistant";
+  12 |   content: string;
+
+Expected 'from', got 'interface'
+
+Import traces:
+  Client Component Browser:
+    ./src/app/chat/page.tsx [Client Component Browser]
+    ./src/app/chat/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/chat/page.tsx [Client Component SSR]
+    ./src/app/chat/page.tsx [Server Component]
+[00:03:32.483] Server  LOG     ✓ Compiled in 32ms
+[00:04:20.608] Server  LOG     ✓ Compiled in 143ms
+[00:04:20.706] Server  LOG     Executed query {}
+[00:05:19.127] Server  LOG     ✓ Compiled in 55ms
+[00:07:39.913] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:07:39.990] Server  LOG     Executed query {}
+[00:08:14.002] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:08:14.152] Server  LOG     Executed query {}
+[00:08:51.513] Server  LOG     ✓ Compiled in 66ms
+[00:08:51.617] Server  LOG     ✓ Compiled in 108ms
+[00:10:44.379] Server  LOG     ✓ Compiled in 68ms
+[00:11:30.996] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:11:31.185] Server  LOG     Executed query {}
+[00:11:32.432] Browser LOG     Toggling theme from light to dark
+[00:12:21.805] Server  LOG     ✓ Compiled in 82ms
+[00:12:24.221] Server  LOG     ✓ Compiled in 99ms
+[00:12:25.748] Server  LOG     ✓ Compiled in 31ms
+[00:12:27.887] Server  LOG     ✓ Compiled in 40ms
+[00:12:29.179] Server  LOG     ✓ Compiled in 87ms
+[00:12:31.356] Server  LOG     ✓ Compiled in 60ms
+[00:12:36.539] Server  LOG     ✓ Compiled in 39ms
+[00:12:39.305] Server  LOG     ✓ Compiled in 51ms
+[00:12:40.807] Server  LOG     ✓ Compiled in 51ms
+[00:12:42.044] Server  LOG     ✓ Compiled in 47ms
+[00:12:48.628] Server  LOG     ✓ Compiled in 27ms
+[00:12:50.515] Server  LOG     ✓ Compiled in 58ms
+[00:12:51.778] Server  LOG     ✓ Compiled in 39ms
+[00:12:56.405] Server  LOG     ✓ Compiled in 64ms
+[00:12:58.048] Server  LOG     ✓ Compiled in 52ms
+[00:12:59.555] Server  LOG     ✓ Compiled in 66ms
+[00:13:00.925] Server  LOG     ✓ Compiled in 96ms
+[00:13:02.400] Server  LOG     ✓ Compiled in 46ms
+[00:13:05.310] Server  LOG     ✓ Compiled in 106ms
+[00:13:31.734] Server  LOG     ✓ Compiled in 89ms
+[00:14:12.876] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:14:13.052] Server  LOG     Executed query {}
+[00:14:14.453] Browser LOG     Toggling theme from dark to light
+[00:14:17.108] Browser LOG     Toggling theme from light to dark
+[00:14:18.354] Browser LOG     Toggling theme from dark to light
+[00:14:18.931] Browser LOG     Toggling theme from light to dark
+[00:14:20.152] Browser LOG     Toggling theme from dark to light
+[00:14:43.894] Server  LOG     ✓ Compiled in 41ms
+[00:14:44.481] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:14:44.559] Server  LOG     Executed query {}
