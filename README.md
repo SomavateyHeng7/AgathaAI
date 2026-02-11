@@ -14,22 +14,19 @@ Enterprise-grade platform for accessing multiple Large Language Models through a
 
 ### Core Capabilities
 - ✅ **Multi-Model Support** - OpenAI (GPT-4, GPT-4o, GPT-3.5), Google Gemini (Pro, 1.5 Pro, 1.5 Flash), DeepSeek (Chat, Coder)
-- ✅ **Subscription Management** - Stripe-powered upgrades from Free to Pro ($29/mo) or Enterprise ($299/mo)
-- ✅ **Payment Processing** - Secure checkout, customer portal, webhook handling
 - ✅ **Rate Limiting** - Tier-based requests per minute and concurrent request limits
-- ✅ **Authentication** - JWT tokens, API keys, and Google OAuth for secure access
-- ✅ **Request History** - Full prompt/response history with retention policies
-- ✅ **Usage Analytics** - Real-time statistics and usage tracking
-- ✅ **Async Processing** - Non-blocking inference request handling
+- **Authentication** - Google OAuth and credentials provider
+- ✅ **Usage Tracking** - Token counting and usage statistics per conversation
+- ✅ **Real-time Chat** - Instant responses with loading states
 
 ### User Interface
-- ✅ **ChatGPT-style UI** - Modern dark theme chat interface with light mode support
+- ✅ **ChatGPT-style UI** - Modern chat interface with dark/light mode support
+- ✅ **Collapsible Sidebar** - Recent conversations with delete functionality
+- ✅ **Model Selector** - Easy switching between available AI models
+- ✅ **Rate Limit Notifications** - Visual alerts when limits are reached
 - ✅ **Subscription Page** - Beautiful pricing cards with upgrade flow
-- ✅ **Real-time Updates** - Live message streaming and status updates
-- ✅ **History Management** - Browse, search, and delete past conversations
-- ✅ **Model Selection** - Easy switching between GPT-4, GPT-4o, Gemini Pro, DeepSeek, and more
 - ✅ **Responsive Design** - Works on desktop, tablet, and mobile
-- ✅ **Theme Toggle** - Dark/Light mode with system preference support
+- ✅ **Theme Toggle** - Dark/Light mode with system preference detection
 - ✅ **Google OAuth** - Sign in with Google authentication
 
 ## 📋 Quick Start
@@ -113,13 +110,12 @@ See [docs/NEXTJS_SETUP.md](docs/NEXTJS_SETUP.md) for detailed setup instructions
 - **Language**: TypeScript 5.9.3
 - **Database**: PostgreSQL 14+ with pg driver
 - **Authentication**: NextAuth 4.24 + bcrypt
-- **Payments**: Stripe (latest)
 - **Validation**: Zod 3.22
 - **Session Management**: JWT tokens
 
 ### LLM Integration
 - **OpenAI SDK 4.24** - GPT-4, GPT-4o, GPT-3.5 Turbo
-- **Google Generative AI 0.21** - Gemini Pro, Gemini 1.5 Pro, Gemini 1.5 Flash
+- **Google Generative AI 0.21** - Gemini 2.5 Flash, Gemini 2.0 Flash
 
 ## 📁 Project Structure
 
