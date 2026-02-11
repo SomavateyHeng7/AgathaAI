@@ -46,6 +46,10 @@ export default function ChatPage() {
   const [conversationToDelete, setConversationToDelete] = useState<
     string | null
   >(null);
+  const [rateLimitNotification, setRateLimitNotification] = useState<{
+    show: boolean;
+    message: string;
+  }>({ show: false, message: "" });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -141,7 +145,21 @@ export default function ChatPage() {
         }
       } else {
         const error = await res.json();
-        alert(error.error || "Failed to send message");
+        
+        // Check if it's a rate limit error
+        if (res.status === 429) {
+          setRateLimitNotification({
+            show: true,
+            message: error.error || "Rate limit exceeded. Please upgrade your plan or wait before sending more messages.",
+          });
+          
+          // Auto-hide after 5 seconds
+          setTimeout(() => {
+            setRateLimitNotification({ show: false, message: "" });
+          }, 5000);
+        } else {
+          alert(error.error || "Failed to send message");
+        }
       }
     } catch (error) {
       console.error("Chat error:", error);
@@ -236,7 +254,7 @@ export default function ChatPage() {
             <div key={conv.id} className="group relative mb-1">
               <button
                 onClick={() => loadConversation(conv.id)}
-                className={`w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-gray-200 dark:hover:bg-gray-800 ${
+                className={`w-full rounded-lg px-3 py-2 pr-10 text-left text-sm hover:bg-gray-200 dark:hover:bg-gray-800 ${
                   currentConversationId === conv.id
                     ? "bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white"
                     : "text-gray-700 dark:text-gray-300"
@@ -256,15 +274,19 @@ export default function ChatPage() {
                       d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
                     />
                   </svg>
-                  <span className="flex-1 truncate">{conv.title}</span>
+                  <span className="flex-1 truncate pr-2">{conv.title}</span>
                 </div>
-                <div className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                <div className="mt-1 text-xs text-gray-500 dark:text-gray-500 truncate pr-2">
                   {conv.message_count} messages · {conv.model}
                 </div>
               </button>
               <button
-                onClick={() => deleteConversation(conv.id)}
-                className="absolute right-2 top-2 hidden rounded p-1 hover:bg-gray-300 dark:hover:bg-gray-700 group-hover:block"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteConversation(conv.id);
+                }}
+                className="absolute right-2 top-2 hidden rounded p-1.5 hover:bg-gray-300 dark:hover:bg-gray-700 group-hover:block z-10"
+                title="Delete conversation"
               >
                 <svg
                   className="h-4 w-4 text-gray-600 dark:text-gray-400"
@@ -506,6 +528,65 @@ export default function ChatPage() {
           </form>
         </div>
       </div>
+
+      {/* Rate Limit Notification */}
+      {rateLimitNotification.show && (
+        <div className="fixed top-4 right-4 z-50 max-w-md animate-slide-in">
+          <div className="rounded-lg border border-orange-500 bg-orange-50 dark:bg-orange-900/20 p-4 shadow-lg">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-6 w-6 text-orange-600 dark:text-orange-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-orange-800 dark:text-orange-300">
+                  Rate Limit Exceeded
+                </h3>
+                <p className="mt-1 text-sm text-orange-700 dark:text-orange-400">
+                  {rateLimitNotification.message}
+                </p>
+                <a
+                  href="/subscribe"
+                  className="mt-2 inline-block text-sm font-medium text-orange-600 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-200 underline"
+                >
+                  Upgrade your plan →
+                </a>
+              </div>
+              <button
+                onClick={() =>
+                  setRateLimitNotification({ show: false, message: "" })
+                }
+                className="flex-shrink-0 rounded-lg p-1 text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-800/30"
+              >
+                <svg
+                  className="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Confirmation Dialog */}
       {deleteDialogOpen && (
