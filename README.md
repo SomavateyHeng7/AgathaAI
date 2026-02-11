@@ -1,3 +1,28 @@
+# AgathaAI - LLM-as-a-Service Platform
+
+Enterprise-grade platform for accessing multiple Large Language Models through a unified chat interface with intelligent rate limiting and subscription management.
+
+## 🚀 Features
+
+### Core Capabilities
+- ✅ **Multi-Model Support** - OpenAI (GPT-4, GPT-4o, GPT-3.5 Turbo), Google Gemini (2.5 Flash, 2.0 Flash)
+- ✅ **Intelligent Model Rate Limiting** - Per-model question limits with automatic fallback
+- ✅ **Subscription Management** - Stripe-powered upgrades from Free to Pro ($29/mo) or Enterprise ($299/mo)
+- ✅ **Payment Processing** - Secure checkout, customer portal, webhook handling
+- ✅ **Conversation History** - Full chat history with persistence across sessions
+- ✅ **Authentication** - NextAuth with Google OAuth and credentials provider
+- ✅ **Usage Tracking** - Token counting and usage statistics per conversation
+- ✅ **Real-time Chat** - Instant responses with loading states
+
+### User Interface
+- ✅ **ChatGPT-style UI** - Modern chat interface with dark/light mode support
+- ✅ **Collapsible Sidebar** - Recent conversations with delete functionality
+- ✅ **Model Selector** - Easy switching between available AI models
+- ✅ **Rate Limit Notifications** - Visual alerts when limits are reached
+- ✅ **Subscription Page** - Beautiful pricing cards with upgrade flow
+- ✅ **Responsive Design** - Works on desktop, tablet, and mobile
+- ✅ **Theme Toggle** - Dark/Light mode with system preference detection
+
 ## 🚦 Model Rate Limiting
 
 For chat models, users are limited per model as follows:
@@ -5,32 +30,7 @@ For chat models, users are limited per model as follows:
 - **GPT-4**: 10 questions per 2 hours. After reaching the limit, users are automatically switched to **GPT-3.5 Turbo**.
 - **GPT-3.5 Turbo**: 30 questions per 2 hours. After reaching the limit, users must wait for the 2-hour window to reset.
 
-If both limits are exceeded, the user must wait for the respective reset window. Limits are tracked per user and per model.
-# AgathaAI - LLM-as-a-Service
-
-Enterprise-grade platform for accessing multiple Large Language Models through a unified API gateway with subscription-based rate limiting and comprehensive management features.
-
-## 🚀 Features
-
-### Core Capabilities
-- ✅ **Multi-Model Support** - OpenAI (GPT-4, GPT-4o, GPT-3.5), Google Gemini (Pro, 1.5 Pro, 1.5 Flash), DeepSeek (Chat, Coder)
-- ✅ **Subscription Management** - Stripe-powered upgrades from Free to Pro ($29/mo) or Enterprise ($299/mo)
-- ✅ **Payment Processing** - Secure checkout, customer portal, webhook handling
-- ✅ **Rate Limiting** - Tier-based requests per minute and concurrent request limits
-- ✅ **Authentication** - JWT tokens, API keys, and Google OAuth for secure access
-- ✅ **Request History** - Full prompt/response history with retention policies
-- ✅ **Usage Analytics** - Real-time statistics and usage tracking
-- ✅ **Async Processing** - Non-blocking inference request handling
-
-### User Interface
-- ✅ **ChatGPT-style UI** - Modern dark theme chat interface with light mode support
-- ✅ **Subscription Page** - Beautiful pricing cards with upgrade flow
-- ✅ **Real-time Updates** - Live message streaming and status updates
-- ✅ **History Management** - Browse, search, and delete past conversations
-- ✅ **Model Selection** - Easy switching between GPT-4, GPT-4o, Gemini Pro, DeepSeek, and more
-- ✅ **Responsive Design** - Works on desktop, tablet, and mobile
-- ✅ **Theme Toggle** - Dark/Light mode with system preference support
-- ✅ **Google OAuth** - Sign in with Google authentication
+If both limits are exceeded, the user must wait for the respective reset window. Limits are tracked per user and per model in the `model_rate_limits` table.
 
 ## 📋 Quick Start
 
@@ -38,71 +38,82 @@ Enterprise-grade platform for accessing multiple Large Language Models through a
 
 ```bash
 # 1. Install dependencies
-pnpm install
+npm install
 
 # 2. Setup database
 createdb agatha_ai
-pnpm run db:migrate
-pnpm run db:seed
+psql $DATABASE_URL -f database/schema.sql
+psql $DATABASE_URL -f database/migrations/002_chat_tables.sql
+psql $DATABASE_URL -f database/migrations/003_add_stripe_customer_id.sql
 
 # 3. Configure environment
 cp .env.example .env
-# Edit .env with your DATABASE_URL, NEXTAUTH_SECRET, OPENAI_API_KEY, and GEMINI_API_KEY
+# Edit .env with your:
+# - DATABASE_URL
+# - NEXTAUTH_SECRET
+# - NEXTAUTH_URL
+# - GOOGLE_CLIENT_ID & GOOGLE_CLIENT_SECRET
+# - OPENAI_API_KEY (optional)
+# - GEMINI_API_KEY (optional)
+# - STRIPE_SECRET_KEY (optional)
 
 # 4. Start server
-pnpm run dev
+npm run dev
 
 # 5. Open http://localhost:3000
-# Login with: demo.free@genai.com / Demo123!
 ```
-
-See [docs/NEXTJS_SETUP.md](docs/NEXTJS_SETUP.md) for detailed setup instructions.
 
 ## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Next.js Full-Stack Application                │
+│                    Next.js 16 Full-Stack Application             │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                   │
-│  Frontend (React)              Backend (API Routes)              │
+│  Frontend (React 19)           Backend (API Routes)              │
 │  ├── src/app/                  ├── src/app/api/                 │
-│  │   ├── landing/              │   ├── auth/                    │
-│  │   ├── features/             │   ├── inference/               │
-│  │   ├── pricing/              │   ├── history/                 │
-│  │   └── ...                   │   └── rate-limit/              │
+│  │   ├── chat/                 │   ├── auth/                    │
+│  │   ├── subscribe/            │   ├── chat/                    │
+│  │   ├── signin/               │   ├── stripe/                  │
+│  │   └── ...                   │   └── ...                      │
 │  │                              │                                │
 │  └── src/components/           └── src/lib/                     │
 │      ├── ChatInterface         │   ├── database.ts              │
-│      ├── Sidebar               │   ├── auth-server.ts           │
-│      └── ...                   │   ├── rateLimit.ts             │
-│                                 │   └── llm.ts                   │
+│      ├── Sidebar               │   ├── auth-config.ts           │
+│      ├── ThemeToggle           │   ├── rateLimit.ts             │
+│      └── ...                   │   └── llm.ts                   │
 │                                                                   │
 └─────────────────────────────────────────────────────────────────┘
                          │
                          ▼
                 ┌────────────────────┐
-                │  PostgreSQL 14     │
-                │  15+ Tables        │
+                │  PostgreSQL 14+    │
+                │  - users           │
+                │  - conversations   │
+                │  - messages        │
+                │  - rate_limits     │
+                │  - subscriptions   │
                 └────────────────────┘
                          │
                          ▼
                 ┌────────────────────┐
                 │  LLM Providers     │
-                │  OpenAI            │
-                │  Google Gemini     │
+                │  - OpenAI          │
+                │  - Google Gemini   │
                 └────────────────────┘
 ```
 
-## � Subscription Tiers
+**📖 For detailed architecture diagrams, see [docs/SYSTEM_ARCHITECTURE.md](docs/SYSTEM_ARCHITECTURE.md)**
 
-| Tier | Monthly Pricing | Rate Limits | Features | Target User |
-|------|----------------|-------------|----------|-------------|
-| **Free** | $0 / forever | 10 req/min<br>100K tokens/month<br>2 concurrent | GPT-3.5 Turbo<br>7 days retention<br>Community support | Product discovery |
-| **Pro** | $29 / month | 100 req/min<br>1M tokens/month<br>10 concurrent | GPT-4, GPT-4o, Gemini Pro<br>30 days retention<br>Priority support<br>API access | Power users |
-| **Enterprise** | $299 / month | 10,000 req/min<br>Unlimited tokens<br>500 concurrent | All models (GPT-4, Claude, Gemini, DeepSeek)<br>Unlimited retention<br>Dedicated support<br>Custom integrations<br>SLA guarantee | Teams & orgs |
+## 💳 Subscription Tiers
 
-**Upgrade anytime at `/subscribe` with Stripe-powered checkout!**
+| Tier | Monthly Price | Rate Limits | Features | Target User |
+|------|--------------|-------------|----------|-------------|
+| **Free** | $0 | 10 req/min<br>2 concurrent | GPT-3.5 Turbo<br>7 days retention<br>Community support | Product discovery |
+| **Pro** | $29 | 100 req/min<br>10 concurrent | GPT-4, Gemini Pro<br>30 days retention<br>Priority support | Power users |
+| **Enterprise** | $299 | 10,000 req/min<br>500 concurrent | All models<br>Unlimited retention<br>Dedicated support<br>SLA guarantee | Teams & orgs |
+
+**Note:** Model-specific rate limits (GPT-4: 10q/2h, GPT-3.5: 30q/2h) apply to all tiers.
 
 ## 🛠️ Tech Stack
 
@@ -112,159 +123,236 @@ See [docs/NEXTJS_SETUP.md](docs/NEXTJS_SETUP.md) for detailed setup instructions
 - **Styling**: Tailwind CSS 4
 - **UI Library**: React 19.2.3
 - **State Management**: Zustand 5.0
-- **Icons**: Lucide React
-- **Theme**: Next-themes (dark/light mode)
+- **Theme**: next-themes (dark/light mode)
 
 ### Backend
 - **Framework**: Next.js 16.1.3 API Routes
 - **Language**: TypeScript 5.9.3
 - **Database**: PostgreSQL 14+ with pg driver
-- **Authentication**: NextAuth 4.24 + bcrypt
-- **Payments**: Stripe (latest)
-- **Validation**: Zod 3.22
-- **Session Management**: JWT tokens
+- **Authentication**: NextAuth 4.24 (Google OAuth + Credentials)
+- **Payments**: Stripe 20.3.0
+- **Password Hashing**: bcrypt 5.1.1
 
 ### LLM Integration
 - **OpenAI SDK 4.24** - GPT-4, GPT-4o, GPT-3.5 Turbo
-- **Google Generative AI 0.21** - Gemini Pro, Gemini 1.5 Pro, Gemini 1.5 Flash
+- **Google Generative AI 0.21** - Gemini 2.5 Flash, Gemini 2.0 Flash
 
 ## 📁 Project Structure
 
 ```
 agatha-ai/
-├── src/                      # Next.js full-stack application
-│   ├── app/                  # App Router pages & API routes
-│   │   ├── api/             # API endpoints (auth, chat, inference, history)
-│   │   ├── chat/            # Chat interface page
-│   │   ├── features/        # Features page
-│   │   ├── pricing/         # Pricing page
-│   │   ├── landing/         # Landing page
-│   │   └── ...              # Other pages
-│   ├── components/          # React components
-│   │   ├── ChatInterface.tsx
-│   │   ├── Sidebar.tsx
-│   │   ├── ThemeToggle.tsx
-│   │   └── ui/              # UI components
-│   ├── lib/                 # Utilities & server logic
-│   │   ├── auth-config.ts   # NextAuth configuration
-│   │   ├── database.ts      # PostgreSQL client
-│   │   ├── llm.ts           # LLM integration
-│   │   └── rateLimit.ts     # Rate limiting logic
-│   ├── store/               # Zustand state management
-│   └── types/               # TypeScript types
-├── database/                # PostgreSQL
-│   ├── migrations/          # Schema migrations
-│   ├── seeds/               # Seed data
-│   └── schema.sql           # Complete schema
-├── docs/                    # Documentation
-└── public/                  # Static assets
+├── src/
+│   ├── app/                    # Next.js App Router
+│   │   ├── api/               # API endpoints
+│   │   │   ├── auth/          # Authentication (NextAuth)
+│   │   │   ├── chat/          # Chat endpoints
+│   │   │   └── stripe/        # Payment webhooks
+│   │   ├── chat/              # Main chat page
+│   │   ├── subscribe/         # Subscription management
+│   │   ├── signin/            # Sign in page
+│   │   └── globals.css        # Global styles
+│   ├── components/            # React components
+│   │   ├── ChatInterface.tsx  # Main chat UI
+│   │   ├── Sidebar.tsx        # Conversation sidebar
+│   │   ├── ThemeToggle.tsx    # Dark/light mode toggle
+│   │   └── ui/                # UI components
+│   ├── lib/                   # Server utilities
+│   │   ├── auth-config.ts     # NextAuth configuration
+│   │   ├── database.ts        # PostgreSQL client
+│   │   ├── llm.ts             # LLM integration
+│   │   └── rateLimit.ts       # Rate limiting logic
+│   ├── store/                 # Zustand stores
+│   └── types/                 # TypeScript types
+├── database/
+│   ├── schema.sql             # Main database schema
+│   ├── migrations/            # Schema migrations
+│   │   ├── 002_chat_tables.sql
+│   │   └── 003_add_stripe_customer_id.sql
+│   └── seeds/                 # Seed data
+├── docs/                      # Documentation
+└── public/                    # Static assets
 ```
 
 ## 🔑 API Endpoints
 
-### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user (credentials)
-- `GET /api/auth/me` - Get current user info
-- NextAuth endpoints at `/api/auth/*` - Google OAuth & session management
+### Authentication (NextAuth)
+- `POST /api/auth/signin` - Sign in with credentials or Google
+- `POST /api/auth/signout` - Sign out
+- `GET /api/auth/session` - Get current session
+- `GET /api/auth/callback/google` - Google OAuth callback
 
-### Chat (NextAuth session required)
-- `POST /api/chat` - Send chat message and get response
+### Chat (Session Required)
+- `POST /api/chat` - Send message and get AI response
+  - Checks model rate limits
+  - Auto-fallback from GPT-4 to GPT-3.5 if limit exceeded
+  - Creates or updates conversation
+  - Tracks token usage
 - `GET /api/chat/conversations` - Get user's conversations
-- `GET /api/chat/conversations/[id]` - Get conversation details
+- `GET /api/chat/conversations/[id]` - Get conversation with messages
 - `DELETE /api/chat/conversations/[id]` - Delete conversation
 
-### Subscriptions (NextAuth session required)
+### Subscriptions (Session Required)
 - `POST /api/stripe/create-checkout` - Create Stripe checkout session
 - `POST /api/stripe/create-portal` - Create customer portal session
 - `POST /api/stripe/webhook` - Handle Stripe webhook events
 
-### Inference (API Key required)
-- `POST /api/inference` - Submit inference request
-- `GET /api/inference/[id]` - Get request status
-- `GET /api/inference/[id]/result` - Get inference result
-
-### History (JWT required)
-- `GET /api/history` - Get request history
-- `DELETE /api/history/[id]` - Delete history item
-
-### Rate Limiting (JWT required)
-- `GET /api/rate-limit` - Get current rate limit status
-
 ## 🔒 Security Features
 
-- ✅ Password hashing with bcrypt
-- ✅ NextAuth authentication (credentials + Google OAuth)
-- ✅ JWT token authentication for API routes
-- ✅ API key hashing and validation
-- ✅ SQL injection prevention (parameterized queries)
-- ✅ Session management with secure cookies
-- ✅ Rate limiting per subscription tier
-- ✅ Audit logging for all actions
-- ✅ Input validation with Zod
-- ✅ Password hashing with bcrypt (10 rounds)
+- ✅ **Password Hashing** - bcrypt with 10 rounds
+- ✅ **NextAuth Sessions** - Secure JWT-based sessions
+- ✅ **Google OAuth** - Social authentication
+- ✅ **SQL Injection Prevention** - Parameterized queries
+- ✅ **Rate Limiting** - Per-user, per-model limits
+- ✅ **Stripe Webhook Verification** - Signature validation
+- ✅ **Environment Variables** - Sensitive data protection
 
 ## 📚 Documentation
 
-All documentation is in the `docs/` folder:
-
-### 🎯 Enterprise Proposal (NEW!)
-- **[PROPOSAL_SUMMARY.md](PROPOSAL_SUMMARY.md)** - Proposal overview ⭐
-- **[docs/ENTERPRISE_PROPOSAL.md](docs/ENTERPRISE_PROPOSAL.md)** - Complete architecture proposal
-- **[docs/ARCHITECTURE_DIAGRAMS.md](docs/ARCHITECTURE_DIAGRAMS.md)** - Visual architecture diagrams
-
 ### Essential Guides
-- **[docs/NEXTJS_SETUP.md](docs/NEXTJS_SETUP.md)** - Complete Next.js setup guide
+- **[docs/SYSTEM_ARCHITECTURE.md](docs/SYSTEM_ARCHITECTURE.md)** - Complete system architecture ⭐⭐⭐
 - **[docs/STRIPE_SETUP_GUIDE.md](docs/STRIPE_SETUP_GUIDE.md)** - Stripe integration setup ⭐
 - **[docs/SUBSCRIPTION_FEATURE.md](docs/SUBSCRIPTION_FEATURE.md)** - Subscription feature docs ⭐
-- **[docs/NEXTJS_MIGRATION.md](docs/NEXTJS_MIGRATION.md)** - Express to Next.js migration
-- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** - System design and data flow
-- **[docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md)** - Production deployment
-- **[docs/GO_LIVE_CHECKLIST.md](docs/GO_LIVE_CHECKLIST.md)** - Launch checklist
+- **[docs/UI_FIXES_SUMMARY.md](docs/UI_FIXES_SUMMARY.md)** - Recent UI improvements ⭐
+- **[docs/COMPLETE_FUNCTION_LIST.md](docs/COMPLETE_FUNCTION_LIST.md)** - All 91 functions documented
+- **[docs/NEXTJS_SETUP.md](docs/NEXTJS_SETUP.md)** - Complete setup guide
 
 ### Reference
-- **[docs/INDEX.md](docs/INDEX.md)** - Complete documentation index
+- **[docs/INDEX.md](docs/INDEX.md)** - Documentation index
 - **[docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md)** - Feature status
-- **[docs/FEATURE_CHECKLIST.md](docs/FEATURE_CHECKLIST.md)** - Feature verification
-- **[docs/IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md)** - Complete summary
 - **[database/README.md](database/README.md)** - Database setup
 
-## 🧪 Demo Users
+## 🗄️ Database Schema
 
-All demo users have password: `Demo123!`
+### Core Tables
+- **users** - User accounts and authentication
+- **conversations** - Chat conversations
+- **conversation_messages** - Individual messages
+- **model_rate_limits** - Per-user per-model rate tracking
+- **subscription_plans** - Available subscription tiers
+- **user_subscriptions** - Active subscriptions
+- **invoices** - Payment history
+- **api_keys** - API key management (for future API access)
+- **audit_logs** - Security audit trail
+- **usage_statistics** - Daily usage aggregation
 
-- `demo.free@genai.com` - Free tier (10 req/min, 2 concurrent, 7 days retention)
-- `demo.pro@genai.com` - Pro tier (100 req/min, 10 concurrent, 30 days retention)
-- `demo.plus@genai.com` - Plus tier (500 req/min, 25 concurrent, 90 days retention)
-- `demo.enterprise@genai.com` - Enterprise tier (10,000 req/min, 50 concurrent, unlimited retention)
+## 🎯 Key Features Explained
+
+### 1. Intelligent Rate Limiting
+
+The platform implements two types of rate limiting:
+
+**Tier-Based Limits** (for API/inference endpoints):
+- Free: 10 requests/minute, 2 concurrent
+- Pro: 100 requests/minute, 10 concurrent
+- Enterprise: 10,000 requests/minute, 500 concurrent
+
+**Model-Specific Limits** (for chat):
+- GPT-4: 10 questions per 2 hours → auto-fallback to GPT-3.5
+- GPT-3.5 Turbo: 30 questions per 2 hours → must wait
+
+### 2. Conversation Management
+
+- Conversations are automatically created on first message
+- Title is generated from first message (first 100 chars)
+- Messages are stored with role (user/assistant)
+- Token usage is tracked per message
+- Conversations can be loaded and continued
+- Delete functionality with confirmation dialog
+
+### 3. Stripe Integration
+
+- Checkout flow for Pro ($29/mo) and Enterprise ($299/mo)
+- Customer portal for subscription management
+- Webhook handling for subscription events
+- Automatic tier updates in database
+- Invoice tracking
+
+### 4. Theme Support
+
+- Dark mode (default)
+- Light mode
+- System preference detection
+- Smooth transitions
+- Persisted preference
+
+## 🧪 Testing
+
+### Test LLM Integration
+```bash
+# Test API keys
+npm run test:keys
+
+# Test LLM and history
+npm run test:llm
+```
+
+### Manual Testing Checklist
+- [ ] Sign in with Google OAuth
+- [ ] Sign in with email/password
+- [ ] Send message with GPT-3.5
+- [ ] Send message with GPT-4
+- [ ] Hit GPT-4 rate limit (10 messages)
+- [ ] Verify auto-fallback to GPT-3.5
+- [ ] Hit GPT-3.5 rate limit (30 messages)
+- [ ] Verify rate limit notification appears
+- [ ] Create new conversation
+- [ ] Load existing conversation
+- [ ] Delete conversation
+- [ ] Toggle dark/light mode
+- [ ] Upgrade to Pro plan
+- [ ] Manage subscription in portal
 
 ## 🚀 Deployment
 
-See [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) for complete production deployment instructions.
+### Environment Variables Required
 
-### Quick Deploy Options
-
-**Vercel (Recommended)**
 ```bash
-vercel --prod
+# Database
+DATABASE_URL=postgresql://user:pass@host:5432/dbname
+
+# NextAuth
+NEXTAUTH_SECRET=your-secret-key-here
+NEXTAUTH_URL=https://yourdomain.com
+
+# Google OAuth
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# LLM Providers (at least one required)
+OPENAI_API_KEY=sk-...
+GEMINI_API_KEY=AIza...
+
+# Stripe (optional, for subscriptions)
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_PRICE_ID_PRO=price_...
+STRIPE_PRICE_ID_ENTERPRISE=price_...
 ```
 
-**Docker**
-```bash
-docker-compose up -d
-```
+### Deployment Steps
 
-**AWS/GCP/Azure**
-See deployment guide for detailed instructions.
+1. **Database Setup**
+   ```bash
+   psql $DATABASE_URL -f database/schema.sql
+   psql $DATABASE_URL -f database/migrations/002_chat_tables.sql
+   psql $DATABASE_URL -f database/migrations/003_add_stripe_customer_id.sql
+   ```
 
-## 📈 Monitoring & Analytics
+2. **Build Application**
+   ```bash
+   npm run build
+   ```
 
-- Health check endpoint: `GET /health`
-- Real-time usage statistics
-- Request/response logging
-- Error tracking
-- Audit logs for security
-- Database connection pooling
+3. **Start Production Server**
+   ```bash
+   npm start
+   ```
+
+### Recommended Platforms
+- **Vercel** - Optimized for Next.js (recommended)
+- **Railway** - Easy PostgreSQL + Next.js deployment
+- **DigitalOcean App Platform** - Full control
+- **AWS/GCP/Azure** - Enterprise deployments
 
 ## 💰 Cost Estimation
 
@@ -272,12 +360,15 @@ See deployment guide for detailed instructions.
 - ✅ All code complete and ready
 
 ### Production (Monthly)
-- Database: $25-500 (based on scale)
-- Backend hosting: $20-500 (based on scale)
-- Frontend hosting: $0-100 (Vercel free tier available)
-- LLM APIs: Pay per use (variable)
+- **Database**: $25-100 (managed PostgreSQL)
+- **Hosting**: $0-50 (Vercel free tier or paid)
+- **LLM API Costs**: Variable (pay per use)
+  - OpenAI GPT-4: ~$0.03 per 1K tokens
+  - OpenAI GPT-3.5: ~$0.002 per 1K tokens
+  - Google Gemini: Free tier available
+- **Stripe Fees**: 2.9% + $0.30 per transaction
 
-**Total: ~$45-1150/month + LLM API costs**
+**Total**: ~$25-150/month + LLM usage
 
 ## 🤝 Contributing
 
@@ -294,40 +385,43 @@ MIT License - See LICENSE file for details
 ## 🆘 Support
 
 For issues or questions:
-1. Check the [Quick Start Guide](docs/QUICK_START.md)
-2. Review [Documentation](docs/PROJECT_STATUS.md)
+1. Check the [Documentation](docs/)
+2. Review [Complete Function List](docs/COMPLETE_FUNCTION_LIST.md)
 3. Check existing issues
 4. Create a new issue with details
 
 ## 🎯 Roadmap
 
 ### ✅ Completed
-- Full frontend UI with dark/light theme
-- Complete Next.js API routes
-- PostgreSQL database schema (15+ tables)
+- Full chat interface with dark/light theme
 - NextAuth authentication with Google OAuth
-- Stripe subscription management (Pro $29/mo, Enterprise $299/mo)
-- Payment processing with checkout and customer portal
-- Webhook handling for subscription events
-- Multi-LLM integration (OpenAI, Gemini, DeepSeek)
+- Multi-model LLM integration (OpenAI, Gemini)
+- Intelligent model rate limiting with auto-fallback
 - Conversation history with persistence
-- Rate limiting per tier
-- Usage tracking and analytics
+- Stripe subscription management
+- Payment processing with webhooks
+- Rate limit notifications
 - Responsive design
+- Theme toggle
 
 ### 🔄 In Progress
-- Email verification service
+- Email verification
 - Admin dashboard
 
 ### 📋 Planned
-- Team collaboration
-- Custom model fine-tuning
+- DeepSeek integration
+- Claude integration
+- Team collaboration features
+- Usage analytics dashboard
+- API key management UI
 - Prompt templates
-- SDK libraries (Python, Node.js)
+- Export conversations
 - Mobile app
 
 ---
 
 **Built with ❤️ for Enterprise GenAI**
 
-Ready to deploy? Start with the [Quick Start Guide](docs/QUICK_START.md)!
+**Version**: 1.0.0  
+**Last Updated**: February 5, 2026  
+**Status**: Production Ready ✅
