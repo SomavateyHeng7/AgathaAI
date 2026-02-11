@@ -95,14 +95,7 @@ See [docs/NEXTJS_SETUP.md](docs/NEXTJS_SETUP.md) for detailed setup instructions
 ```
 
 ## � Subscription Tiers
-
-| Tier | Monthly Pricing | Rate Limits | Features | Target User |
-|------|----------------|-------------|----------|-------------|
-| **Free** | $0 / forever | 10 req/min<br>100K tokens/month<br>2 concurrent | GPT-3.5 Turbo<br>7 days retention<br>Community support | Product discovery |
-| **Pro** | $29 / month | 100 req/min<br>1M tokens/month<br>10 concurrent | GPT-4, GPT-4o, Gemini Pro<br>30 days retention<br>Priority support<br>API access | Power users |
-| **Enterprise** | $299 / month | 10,000 req/min<br>Unlimited tokens<br>500 concurrent | All models (GPT-4, Claude, Gemini, DeepSeek)<br>Unlimited retention<br>Dedicated support<br>Custom integrations<br>SLA guarantee | Teams & orgs |
-
-**Upgrade anytime at `/subscribe` with Stripe-powered checkout!**
+<img width="950" height="313" alt="Screenshot 2569-02-11 at 20 16 56" src="https://github.com/user-attachments/assets/e9756627-caca-4cff-aaf2-0c1ccca751ae" />
 
 ## 🛠️ Tech Stack
 
@@ -229,33 +222,6 @@ All documentation is in the `docs/` folder:
 - **[docs/IMPLEMENTATION_SUMMARY.md](docs/IMPLEMENTATION_SUMMARY.md)** - Complete summary
 - **[database/README.md](database/README.md)** - Database setup
 
-## 🧪 Demo Users
-
-All demo users have password: `Demo123!`
-
-- `demo.free@genai.com` - Free tier (10 req/min, 2 concurrent, 7 days retention)
-- `demo.pro@genai.com` - Pro tier (100 req/min, 10 concurrent, 30 days retention)
-- `demo.plus@genai.com` - Plus tier (500 req/min, 25 concurrent, 90 days retention)
-- `demo.enterprise@genai.com` - Enterprise tier (10,000 req/min, 50 concurrent, unlimited retention)
-
-## 🚀 Deployment
-
-See [docs/DEPLOYMENT_GUIDE.md](docs/DEPLOYMENT_GUIDE.md) for complete production deployment instructions.
-
-### Quick Deploy Options
-
-**Vercel (Recommended)**
-```bash
-vercel --prod
-```
-
-**Docker**
-```bash
-docker-compose up -d
-```
-
-**AWS/GCP/Azure**
-See deployment guide for detailed instructions.
 
 ## 📈 Monitoring & Analytics
 
@@ -267,17 +233,8 @@ See deployment guide for detailed instructions.
 - Database connection pooling
 
 ## 💰 Cost Estimation
+<img width="614" height="485" alt="Screenshot 2569-02-11 at 20 15 34" src="https://github.com/user-attachments/assets/23a42faa-56fd-4409-8c67-5737eff2413e" />
 
-### Development
-- ✅ All code complete and ready
-
-### Production (Monthly)
-- Database: $25-500 (based on scale)
-- Backend hosting: $20-500 (based on scale)
-- Frontend hosting: $0-100 (Vercel free tier available)
-- LLM APIs: Pay per use (variable)
-
-**Total: ~$45-1150/month + LLM API costs**
 
 ## 🤝 Contributing
 
@@ -329,5 +286,3 @@ For issues or questions:
 ---
 
 **Built with ❤️ for Enterprise GenAI**
-
-Ready to deploy? Start with the [Quick Start Guide](docs/QUICK_START.md)!
