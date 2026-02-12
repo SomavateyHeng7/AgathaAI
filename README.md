@@ -65,55 +65,18 @@ npm run dev
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Next.js 16 Full-Stack Application             │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                   │
-│  Frontend (React 19)           Backend (API Routes)              │
-│  ├── src/app/                  ├── src/app/api/                 │
-│  │   ├── chat/                 │   ├── auth/                    │
-│  │   ├── subscribe/            │   ├── chat/                    │
-│  │   ├── signin/               │   ├── stripe/                  │
-│  │   └── ...                   │   └── ...                      │
-│  │                              │                                │
-│  └── src/components/           └── src/lib/                     │
-│      ├── ChatInterface         │   ├── database.ts              │
-│      ├── Sidebar               │   ├── auth-config.ts           │
-│      ├── ThemeToggle           │   ├── rateLimit.ts             │
-│      └── ...                   │   └── llm.ts                   │
-│                                                                   │
-└─────────────────────────────────────────────────────────────────┘
-                         │
-                         ▼
-                ┌────────────────────┐
-                │  PostgreSQL 14+    │
-                │  - users           │
-                │  - conversations   │
-                │  - messages        │
-                │  - rate_limits     │
-                │  - subscriptions   │
-                └────────────────────┘
-                         │
-                         ▼
-                ┌────────────────────┐
-                │  LLM Providers     │
-                │  - OpenAI          │
-                │  - Google Gemini   │
-                └────────────────────┘
-```
+<img width="602" height="460" alt="Screenshot 2569-02-12 at 12 15 41" src="https://github.com/user-attachments/assets/8bdd9ea3-f04c-45a8-af9f-e6fd9baf3007" />
 
-**📖 For detailed architecture diagrams, see [docs/SYSTEM_ARCHITECTURE.md](docs/SYSTEM_ARCHITECTURE.md)**
 
-## 💳 Subscription Tiers
+## 💳 Business Model
 
-| Tier | Monthly Price | Rate Limits | Features | Target User |
-|------|--------------|-------------|----------|-------------|
-| **Free** | $0 | 10 req/min<br>2 concurrent | GPT-3.5 Turbo<br>7 days retention<br>Community support | Product discovery |
-| **Pro** | $29 | 100 req/min<br>10 concurrent | GPT-4, Gemini Pro<br>30 days retention<br>Priority support | Power users |
-| **Enterprise** | $299 | 10,000 req/min<br>500 concurrent | All models<br>Unlimited retention<br>Dedicated support<br>SLA guarantee | Teams & orgs |
+<img width="945" height="307" alt="Screenshot 2569-02-12 at 12 15 03" src="https://github.com/user-attachments/assets/cadf4992-2db4-4433-a29f-6deea5681fb1" />
 
-**Note:** Model-specific rate limits (GPT-4: 10q/2h, GPT-3.5: 30q/2h) apply to all tiers.
+
+##Cost Estimation
+<img width="622" height="487" alt="Screenshot 2569-02-12 at 12 17 44" src="https://github.com/user-attachments/assets/25f2317f-a695-4567-ab7c-e0487bcf62d5" />
+
+
 
 ## 🛠️ Tech Stack
 
@@ -191,49 +154,12 @@ agatha-ai/
 - `GET /api/chat/conversations/[id]` - Get conversation with messages
 - `DELETE /api/chat/conversations/[id]` - Delete conversation
 
-### Subscriptions (Session Required)
-- `POST /api/stripe/create-checkout` - Create Stripe checkout session
-- `POST /api/stripe/create-portal` - Create customer portal session
-- `POST /api/stripe/webhook` - Handle Stripe webhook events
-
 ## 🔒 Security Features
-
-- ✅ **Password Hashing** - bcrypt with 10 rounds
-- ✅ **NextAuth Sessions** - Secure JWT-based sessions
 - ✅ **Google OAuth** - Social authentication
 - ✅ **SQL Injection Prevention** - Parameterized queries
 - ✅ **Rate Limiting** - Per-user, per-model limits
 - ✅ **Stripe Webhook Verification** - Signature validation
 - ✅ **Environment Variables** - Sensitive data protection
-
-## 📚 Documentation
-
-### Essential Guides
-- **[docs/SYSTEM_ARCHITECTURE.md](docs/SYSTEM_ARCHITECTURE.md)** - Complete system architecture ⭐⭐⭐
-- **[docs/STRIPE_SETUP_GUIDE.md](docs/STRIPE_SETUP_GUIDE.md)** - Stripe integration setup ⭐
-- **[docs/SUBSCRIPTION_FEATURE.md](docs/SUBSCRIPTION_FEATURE.md)** - Subscription feature docs ⭐
-- **[docs/UI_FIXES_SUMMARY.md](docs/UI_FIXES_SUMMARY.md)** - Recent UI improvements ⭐
-- **[docs/COMPLETE_FUNCTION_LIST.md](docs/COMPLETE_FUNCTION_LIST.md)** - All 91 functions documented
-- **[docs/NEXTJS_SETUP.md](docs/NEXTJS_SETUP.md)** - Complete setup guide
-
-### Reference
-- **[docs/INDEX.md](docs/INDEX.md)** - Documentation index
-- **[docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md)** - Feature status
-- **[database/README.md](database/README.md)** - Database setup
-
-## 🗄️ Database Schema
-
-### Core Tables
-- **users** - User accounts and authentication
-- **conversations** - Chat conversations
-- **conversation_messages** - Individual messages
-- **model_rate_limits** - Per-user per-model rate tracking
-- **subscription_plans** - Available subscription tiers
-- **user_subscriptions** - Active subscriptions
-- **invoices** - Payment history
-- **api_keys** - API key management (for future API access)
-- **audit_logs** - Security audit trail
-- **usage_statistics** - Daily usage aggregation
 
 ## 🎯 Key Features Explained
 
@@ -394,7 +320,7 @@ For issues or questions:
 
 ### ✅ Completed
 - Full chat interface with dark/light theme
-- NextAuth authentication with Google OAuth
+- Google OAuth Authentication
 - Multi-model LLM integration (OpenAI, Gemini)
 - Intelligent model rate limiting with auto-fallback
 - Conversation history with persistence
@@ -404,24 +330,9 @@ For issues or questions:
 - Responsive design
 - Theme toggle
 
-### 🔄 In Progress
-- Email verification
-- Admin dashboard
-
-### 📋 Planned
-- DeepSeek integration
-- Claude integration
-- Team collaboration features
-- Usage analytics dashboard
-- API key management UI
-- Prompt templates
-- Export conversations
-- Mobile app
-
 ---
 
 **Built with ❤️ for Enterprise GenAI**
 
 **Version**: 1.0.0  
 **Last Updated**: February 5, 2026  
-**Status**: Production Ready ✅
